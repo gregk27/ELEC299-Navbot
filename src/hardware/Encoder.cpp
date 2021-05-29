@@ -17,7 +17,7 @@ Encoder::Encoder(){
     TCCR1B = 8 | 5; // Set bit 3 for CTC mode, lowest 3 bits as 101 to use 1024 prescaling
                 // 16,000,000/1024 = 15,625 Hz, tick once per 0.064ms
     OCR1A= (int) (speedInterval/0.064); // Get count required for 500ms delay
-    TIMSK1 = 2; 
+    TIMSK1 |= 2; 
     interrupts();
   }
   // Save encoder to list

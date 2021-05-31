@@ -61,3 +61,16 @@ void IMU::init(){
 Position IMU::getPosition(){
   return pos;
 }
+
+void IMU::toPlot(){
+  Serial.print(pos.x);
+  Serial.print("\t");
+  Serial.print(pos.y);
+  Serial.print("\t");
+  Serial.print(pos.heading*180/PI);
+  Serial.println("");
+}
+
+float IMU::headingTo(float x, float y){
+  return atan2((x-pos.x)*2, y-pos.y);
+}

@@ -22,6 +22,18 @@ namespace IMU {
   */
   Position getPosition();
 
+  /**
+   * Print data in format accepted by ArduPlot
+  */
+  void toPlot();
+  
+  /**
+   * Get the heading in radians to a target point
+   * @param x x position of the point
+   * @param y y position of the point
+   * @return The heading in radians facing the point
+  */
+  float headingTo(float x, float y);
 }
 
 #endif

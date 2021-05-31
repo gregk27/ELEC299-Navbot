@@ -26,8 +26,8 @@ class Encoder {
     int interval = 2;
     /** Number of encoder ticks in a revolution */
     int ticksPerRev = 40;
-    /** Distance travelled (m) per revolution */
-    double distPerRev = M_PI * 0.068;
+    /** Distance travelled (cm) per revolution */
+    double distPerRev = M_PI * 6.8;
     /** 
      * Interval used for speed calculation, in ms
      * Can only be set before instantiating any encoders

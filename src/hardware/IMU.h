@@ -6,8 +6,8 @@ namespace IMU {
    * Structure representing the robot's position, relative to start
   */
   struct Position {
-    int x;
-    int y;
+    float x;
+    float y;
     float heading;
   };
 

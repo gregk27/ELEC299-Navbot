@@ -11,29 +11,29 @@ using namespace IMU;
 // -------------------
 
 #define INTERVAL 50
-#define WIDTH 13.0
+#define WIDTH 13.25
 
 // The robot's position
 Position pos;
 
 // The last left encoder count
-int lastLeft = 0;
+float lastLeft = 0;
 // The last right encoder count
-int lastRight = 0;
+float lastRight = 0;
 
 // On B timer, compute new position
 ISR(TIMER1_COMPB_vect){
-  int dLeft = Drivetrain::leftEncoder->getPosition() - lastLeft;
-  int dRight = Drivetrain::rightEncoder->getPosition() - lastRight;
+  float dLeft = Drivetrain::leftEncoder->getPositionCm() - lastLeft;
+  float dRight = Drivetrain::rightEncoder->getPositionCm() - lastRight;
 
-  lastLeft = Drivetrain::leftEncoder->getPosition();
-  lastRight = Drivetrain::rightEncoder->getPosition();
+  lastLeft = Drivetrain::leftEncoder->getPositionCm();
+  lastRight = Drivetrain::rightEncoder->getPositionCm();
 
   float dCentre = (dLeft+dRight)/2.0;
   float phi = (dRight-dLeft)/WIDTH;
 
-  pos.x += dCentre*cos(pos.heading);
-  pos.y += dCentre*sin(pos.heading);
+  pos.x += dCentre*sin(pos.heading);
+  pos.y += dCentre*cos(pos.heading);
   pos.heading += phi;
 }
 

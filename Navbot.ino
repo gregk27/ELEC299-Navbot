@@ -14,40 +14,68 @@ void setup() {
   delay(1000);
 }
 
-int state = 0;
+float holdHeading;
 
 void loop() {
-  IMU::Position pos = IMU::getPosition();
-  IMU::toPlot();
+  // -------
+  //  Sense
+  // -------
   Sensors::periodic();
-  if(state == 0){
-    int sc = Drivetrain::getStraightCorrection();
-    Drivetrain::setOutput(220+sc, 200-sc);
-    if(millis() > 2000){
-      state ++;
-    }
+  IMU::Position pos = IMU::getPosition();
+  float usDist = Sensors::getUltrasonicDistance()->getSmoothed();
+
+  // -------
+  //  Think
+  // -------
+  // Default to Case 0 operation
+  int mode = 4;
+  
+  // Select navigation mode
+  if(Sensors::isOnMarker()){
+    // mode = 4;
+  } else if(Sensors::getLeftIR()->getSmoothed()) {
+    // mode = 3;
+  } else if(usDist > 0 && usDist < 20){
+    mode = 2;
+  } else if(Sensors::getRightIR()->getSmoothed()){
+    // mode = 1;
   }
-  if(state == 1){
-    int lErr = -15-Drivetrain::leftEncoder->getPosition();
-    int rErr = 15-Drivetrain::rightEncoder->getPosition();
-    Drivetrain::setOutput(lErr*25, rErr*25);
-    if(abs(-15-Drivetrain::leftEncoder->getPosition()) <= 5 && 
-          abs(15-Drivetrain::rightEncoder->getPosition()) <= 5) {
-      state ++;
+
+  // -----
+  //  Act
+  // -----
+  // Output location for plotting
+  // IMU::toPlot();
+  Serial.println(usDist);
+
+  switch(mode){
+  case 4:
+    Drivetrain::setOutput(0,0);
+    break;
+  case 3:
+    pivotHeading(pos.heading-1);
+    break;
+  case 2:
+    if(usDist > 12){
+      driveHeading(210, pos.heading+(13-usDist)*0.05);
+      holdHeading = pos.heading;
+    } else if (usDist < 7){
+      driveHeading(210, pos.heading+(8-usDist)*0.05);
+      holdHeading = pos.heading;
+    } else {
+      driveHeading(210, holdHeading);
     }
-  } else if (state == 2){
-    // int sc = Drivetrain::getStraightCorrection();
-    Drivetrain::setOutput(200, 200);
-    if(millis() > 3000){
-      state ++;
-    }
-  } else if(state == 3){
+    break;
+  case 1:
+    pivotHeading(pos.heading-1);
+    break;
+  case 0:
     driveHeading(225, IMU::headingTo(0, 200));
-  }
-  delay(50);
-  while(pos.y > 200){
+    break;
+  default: // If none of the cases, something is wrong
     Drivetrain::setOutput(0, 0);
-  };
+  }
+
 }
 
 void driveHeading(int speed, float hdg){
@@ -55,4 +83,10 @@ void driveHeading(int speed, float hdg){
   float err = hdg-pos.heading;
   // Serial.println(err);
   Drivetrain::setOutput(speed - err*200, speed + err*200);
+}
+
+void pivotHeading(int heading){
+  IMU::Position pos = IMU::getPosition();
+  float err = heading-pos.heading;
+  Drivetrain::setOutput(err*250, -err*250);
 }

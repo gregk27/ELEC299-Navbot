@@ -19,6 +19,7 @@ int state = 0;
 void loop() {
   IMU::Position pos = IMU::getPosition();
   IMU::toPlot();
+  Sensors::periodic();
   if(state == 0){
     int sc = Drivetrain::getStraightCorrection();
     Drivetrain::setOutput(220+sc, 200-sc);

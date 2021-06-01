@@ -1,5 +1,6 @@
 #ifndef SENSORS_H
 #define SENSORS_H
+#include "../utils/SmoothedValue.h"
 
 namespace Sensors {
 
@@ -10,17 +11,21 @@ namespace Sensors {
    * Initialise sensors
   */
   void init();
+  /**
+   * Call from loop to update
+  */
+  void periodic();
 
-  bool getLeftIR();
-  bool getRightIR();
+  SmoothedValue<bool>* getLeftIR();
+  SmoothedValue<bool>* getRightIR();
 
   /**
    * Get the distance returned from the ultrasonic sensor
    * @return Distance read, in cm. Returns -1 if out of range (>50cm), -2 if sensor not ready
   */
-  float getUltrasonicDistance();
+  SmoothedValue<float>* getUltrasonicDistance();
 
-  int getDownwardSensor();
+  SmoothedValue<int>* getDownwardSensor();
   bool isOnMarker();
 }
 

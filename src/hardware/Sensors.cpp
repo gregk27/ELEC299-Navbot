@@ -1,5 +1,6 @@
 #include "./Sensors.h"
 #include <Arduino.h>
+#include "../utils/SmoothedValue.h"
 
 #define LEFT_IR_PIN A3
 #define RIGHT_IR_PIN A2
@@ -13,8 +14,54 @@
 
 using namespace Sensors;
 
+
+template <>
+int SmoothedValue<int>::getSmoothed(){
+  int sum = 0;
+  for(int i=0; i<numSamples; i++){
+    sum += samples[i];
+  }
+  return sum/numSamples;
+}
+
+template <>
+float SmoothedValue<float>::getSmoothed(){
+  float sum = 0;
+  for(int i=0; i<numSamples; i++){
+    sum += samples[i];
+  }
+  return sum/numSamples;
+}
+
+template <>
+bool SmoothedValue<bool>::getSmoothed(){
+  float sum = 0.0f;
+  for(int i=0; i<numSamples; i++){
+    sum += samples[i];
+  }
+  return sum/numSamples > 0.5;
+}
+
 int Sensors::USLastCall = 0;
 int Sensors::DSThreshold = 80;
+
+SmoothedValue<bool> leftIR(5, SmoothFunctions::smoothBool);
+SmoothedValue<bool> rightIR(5, SmoothFunctions::smoothBool);
+SmoothedValue<float> ultrasonic(5, [](float* samples, int count)->float {
+  float sum = 0.0f;
+  int badSamples = 0;
+  for(int i=0; i<count; i++){
+    if(samples[i] >= 0) sum += samples[i];
+    else badSamples ++;
+  }
+  // Need 3 good samples to get value
+  if(badSamples >= 2){
+    return -2;
+  } else {
+    return sum/(count-badSamples);
+  }
+});
+SmoothedValue<int> downward(5, SmoothFunctions::smoothInt);
 
 void Sensors::init(){
   pinMode(LEFT_IR_PIN, INPUT);
@@ -27,15 +74,12 @@ void Sensors::init(){
   pinMode(DS_PIN, INPUT);
 }
 
-bool Sensors::getLeftIR(){
-  return !digitalRead(LEFT_IR_PIN);
-}
-bool Sensors::getRightIR(){
-  return !digitalRead(RIGHT_IR_PIN);
-
-}
-
-float Sensors::getUltrasonicDistance(){
+void Sensors::periodic(){
+  // Sample obstacle sensors
+  leftIR.addSample(!digitalRead(LEFT_IR_PIN));
+  rightIR.addSample(!digitalRead(RIGHT_IR_PIN));
+  
+  // Sample ultrasonic sensor
   if(millis() - USLastCall > US_MIN_INTERVAL){
     // Send trigger pulse
     digitalWrite(US_TRIG_PIN, LOW);
@@ -47,14 +91,26 @@ float Sensors::getUltrasonicDistance(){
     int duration = pulseIn(US_ECHO_PIN, HIGH);
     USLastCall = millis();
     // Return distance, capped at 50cm
-    return duration * US_DURATION_TO_DISTANCE > 50 ? -1 : duration * US_DURATION_TO_DISTANCE;
+    ultrasonic.addSample(duration * US_DURATION_TO_DISTANCE > 50 ? -2 : duration * US_DURATION_TO_DISTANCE);
   }
-  return -2;
+
+  downward.addSample(analogRead(DS_PIN));
 }
 
-int Sensors::getDownwardSensor(){
-  return analogRead(DS_PIN);
+SmoothedValue<bool>* Sensors::getLeftIR(){
+  return &leftIR;
+}
+SmoothedValue<bool>* Sensors::getRightIR(){
+  return &rightIR;
+}
+
+SmoothedValue<float>* Sensors::getUltrasonicDistance(){
+  return &ultrasonic;
+}
+
+SmoothedValue<int>* Sensors::getDownwardSensor(){
+  return &downward;
 }
 bool Sensors::isOnMarker(){
-  return analogRead(DS_PIN) > DSThreshold;
+  return downward.getSmoothed() > DSThreshold;
 }

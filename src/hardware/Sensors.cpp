@@ -54,6 +54,7 @@ SmoothedValue<float> ultrasonic(5, [](float* samples, int count)->float {
     if(samples[i] >= 0) sum += samples[i];
     else badSamples ++;
   }
+  Serial.println(badSamples);
   // Need 3 good samples to get value
   if(badSamples >= 2){
     return -2;
@@ -61,7 +62,7 @@ SmoothedValue<float> ultrasonic(5, [](float* samples, int count)->float {
     return sum/(count-badSamples);
   }
 });
-SmoothedValue<int> downward(5, SmoothFunctions::smoothInt);
+SmoothedValue<int> downward(3, SmoothFunctions::smoothInt);
 
 void Sensors::init(){
   pinMode(LEFT_IR_PIN, INPUT);

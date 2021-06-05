@@ -47,7 +47,7 @@ void IMU::init(){
   TCCR1A = 4; // Set clock to mode 4 (Clear timer on compare match)
   TCCR1B = 8 | 5; // Set bit 3 for CTC mode, lowest 3 bits as 101 to use 1024 prescaling
               // 16,000,000/1024 = 15,625 Hz, tick once per 0.064ms
-  OCR1B= (int) (50/0.064); // Get count required for 50ms delay (Use B timer)
+  OCR1B= (int) (10/0.064); // Get count required for 50ms delay (Use B timer)
   TIMSK1 |= 4; // Enable B timer
   interrupts();
 

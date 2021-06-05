@@ -1,6 +1,9 @@
 #include "./src/hardware/Drivetrain.h"
 #include "./src/hardware/Sensors.h"
 #include "./src/hardware/IMU.h"
+#include "./Scheduler.h"
+
+#include "./src/commands/DriveToPositionCommand.h"
 
 
 void setup() {
@@ -9,7 +12,13 @@ void setup() {
 
   Drivetrain::init(1, 3, 3, 2);
   Sensors::init();
-
+  
+  Scheduler::master = new Scheduler();
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 200, 200, 10));
+  Scheduler::master->addDelay(1000);
+  Scheduler::master->addCommand(new DriveToPositionCommand(50, 100, 200, 15));
+  Scheduler::master->addDelay(1000);
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 0, 200, 5));
 
   // Run selftest
   // while(selfTest){};
@@ -30,58 +39,13 @@ void loop() {
   IMU::Position pos = IMU::getPosition();
   float usDist = Sensors::getUltrasonicDistance()->getSmoothed();
 
-  // -------
-  //  Think
-  // -------
-  // Default to Case 0 operation
-  int mode = 0;
-  
-  // Select navigation mode
-  if(Sensors::isOnMarker()){
-    mode = 4;
-  } else if(Sensors::getLeftIR()->getSmoothed()) {
-    mode = 3;
-  } else if(usDist > 0 && usDist < 20){
-    mode = 2;
-  } else if(Sensors::getRightIR()->getSmoothed()){
-    mode = 1;
-  }
-
   // -----
   //  Act
   // -----
-  // Output location for plotting
-  // IMU::toPlot();
-  Serial.println(mode);
-
-  switch(mode){
-  case 4:
-    Drivetrain::setOutput(0,0);
-    break;
-  case 3:
-    driveHeading(100, pos.heading+1);
-    break;
-  case 2:
-    if(usDist > 12){
-      driveHeading(210, pos.heading+(13-usDist)*0.05);
-      holdHeading = pos.heading;
-    } else if (usDist < 7){
-      driveHeading(210, pos.heading+(8-usDist)*0.05);
-      holdHeading = pos.heading;
-    } else {
-      driveHeading(210, holdHeading);
-    }
-    break;
-  case 1:
-    driveHeading(100, pos.heading+1);
-    break;
-  case 0:
-    driveHeading(225, IMU::headingTo(0, 200));
-    break;
-  default: // If none of the cases, something is wrong
-    Drivetrain::setOutput(0, 0);
-  }
-
+  Scheduler::master->periodic();
+  IMU::toPlot();
+  // Hang when done
+  while(Scheduler::master->isFinished());
 }
 
 void driveHeading(int speed, float hdg){

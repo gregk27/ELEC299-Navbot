@@ -22,7 +22,7 @@ void rightEncoderCallback(){
  * @param e Pointer to the side's encoder
  * @param value Ouput value to use
 */
-void setSide(AF_DCMotor *m, Encoder *e, int value){
+void setSide(AF_DCMotor *m, Encoder *e, int value, int max){
   // Set encoder and motor directions
   e->setDirection(value);
   if(value == 0){
@@ -31,9 +31,10 @@ void setSide(AF_DCMotor *m, Encoder *e, int value){
     return;
   }
   m->run(value < 0 ? BACKWARD : FORWARD);
-  // Clamp value to motor operating range (0-255)
-  value = value < 0 ? -value : value;
-  value = value > 220 ? 220 : value;
+  // Clamp value to motor operating range: provided max, then (0-255)
+  value = abs(value);
+  value = value > max ? max : value;
+  value = value > 255 ? 255 : value;
   // Set the motor speed
   m->setSpeed(value);
 }
@@ -64,10 +65,15 @@ void Drivetrain::init(int lMotor, int rMotor, int lEncoder, int rEncoder) {
   
 }
 
-void Drivetrain::setOutput(int l, int r){
-  setSide(leftMotor, leftEncoder, l);
-  setSide(rightMotor, rightEncoder, r);
+void Drivetrain::setOutput(int l, int r, int max){
+  setSide(leftMotor, leftEncoder, l, max);
+  setSide(rightMotor, rightEncoder, r, max);
 }
+
+void Drivetrain::setOutput(int l, int r){
+  setOutput(l, r, 255);
+}
+
 
 int Drivetrain::getStraightCorrection(){
   int err = rightEncoder->getPosition() - leftEncoder->getPosition();

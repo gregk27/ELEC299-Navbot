@@ -17,9 +17,14 @@ DriveToPositionCommand::DriveToPositionCommand(float x, float y, int speed, floa
 void DriveToPositionCommand::periodic(){
   Position pos = getPosition();
   float err = headingTo(targetX, targetY) - pos.heading;
-  accumErr += err;
-  
-  Drivetrain::setOutput(speed-err*kP-accumErr*kI, speed+err*kP+accumErr*kI);
+  // If more than 90 degrees off, pivot to a more reasonable heading
+  if(abs(err) > PI/2){
+    Drivetrain::setOutput(-err*kP/2, err*kP/2);
+  } else {
+    accumErr += err;
+    
+    Drivetrain::setOutput(speed-err*kP-accumErr*kI, speed+err*kP+accumErr*kI);
+  }
 }
 
 void DriveToPositionCommand::end() {

@@ -4,6 +4,7 @@
 #include "./Scheduler.h"
 
 #include "./src/commands/DriveToPositionCommand.h"
+#include "./src/commands/TurnToHeadingCommand.h"
 
 
 void setup() {
@@ -14,18 +15,25 @@ void setup() {
   Sensors::init();
   
   Scheduler::master = new Scheduler();
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 200, 200, 10));
+  // Scheduler::master->addCommand(new DriveToPositionCommand(0, 200, 200, 10));
+  // Scheduler::master->addDelay(1000);
+  // Scheduler::master->addCommand(new DriveToPositionCommand(50, 100, 200, 15));
+  // Scheduler::master->addDelay(1000);
+  // Scheduler::master->addCommand(new DriveToPositionCommand(0, 0, 200, 5));
+
+  Scheduler::master->addCommand(new TurnToHeadingCommand(-PI/2, false, 210, 0.01));
   Scheduler::master->addDelay(1000);
-  Scheduler::master->addCommand(new DriveToPositionCommand(50, 100, 200, 15));
+  Scheduler::master->addCommand(new TurnToHeadingCommand(PI, false, 210, 0.01));
   Scheduler::master->addDelay(1000);
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 0, 200, 5));
+  Scheduler::master->addCommand(new TurnToHeadingCommand(PI, true, 210, 0.01));
 
   // Run selftest
-  // while(selfTest){};
   Drivetrain::resetPosition();
 
   IMU::init();
 
+
+  Scheduler::master->init();
   delay(1000);
 }
 
@@ -43,7 +51,7 @@ void loop() {
   //  Act
   // -----
   Scheduler::master->periodic();
-  IMU::toPlot();
+  // IMU::toPlot();
   // Hang when done
   while(Scheduler::master->isFinished());
 }

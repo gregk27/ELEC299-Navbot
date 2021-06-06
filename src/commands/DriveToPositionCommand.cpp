@@ -1,7 +1,10 @@
 #include "./DriveToPositionCommand.h"
 #include "../hardware/Drivetrain.h"
+#include "../utils/List.h"
 
 using namespace IMU;
+// List declared in ino file
+extern List<Position> path;
 
 float DriveToPositionCommand::kP = 400;
 float DriveToPositionCommand::kI = 10;
@@ -16,6 +19,10 @@ DriveToPositionCommand::DriveToPositionCommand(float x, float y, int speed, floa
 
 void DriveToPositionCommand::periodic(){
   Position pos = getPosition();
+  // Save position every 500 ms
+  if(millis() % 500 == 0){
+    path.add(pos);
+  }
   float err = headingTo(targetX, targetY) - pos.heading;
   // If more than 90 degrees off, pivot to a more reasonable heading
   if(abs(err) > PI/2){

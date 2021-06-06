@@ -32,6 +32,15 @@ class List {
     }
     
     /**
+     * Remove the last element added
+    */
+    void pop(){
+      if(numElements >= 0){
+        numElements --;
+      }
+    }
+
+    /**
      * Get the size of the list
     */
     int size() {

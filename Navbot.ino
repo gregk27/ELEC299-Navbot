@@ -1,11 +1,16 @@
 #include "./src/hardware/Drivetrain.h"
 #include "./src/hardware/Sensors.h"
 #include "./src/hardware/IMU.h"
+#include "./src/utils/List.h"
 #include "./Scheduler.h"
 
 #include "./src/commands/DriveToPositionCommand.h"
 #include "./src/commands/TurnToHeadingCommand.h"
 
+/**
+ * List of positions build while travelling, used to generate return path
+*/
+List<IMU::Position> path = List<IMU::Position>();
 
 void setup() {
   Serial.begin(115200);

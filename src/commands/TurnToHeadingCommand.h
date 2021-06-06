@@ -16,11 +16,11 @@ class TurnToHeadingCommand: public Command {
     int initialLeftPos;
     int initialRightPos;
 
-
+    unsigned long timeout;
     static float kP_POS;
 
   public:
-    TurnToHeadingCommand(float target, bool absolute, int speed, float tol);
+    TurnToHeadingCommand(float target, bool absolute, int speed, float tol, unsigned long timeout);
 
     void init() override;
     void periodic() override;

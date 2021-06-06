@@ -21,11 +21,11 @@ void setup() {
   // Scheduler::master->addDelay(1000);
   // Scheduler::master->addCommand(new DriveToPositionCommand(0, 0, 200, 5));
 
-  Scheduler::master->addCommand(new TurnToHeadingCommand(-PI/2, false, 210, 0.01));
+  Scheduler::master->addCommand(new TurnToHeadingCommand(PI/2, false, 220, 0.01, 3000));
   Scheduler::master->addDelay(1000);
-  Scheduler::master->addCommand(new TurnToHeadingCommand(PI, false, 210, 0.01));
+  Scheduler::master->addCommand(new TurnToHeadingCommand(-PI, false, 220, 0.01, 3000));
   Scheduler::master->addDelay(1000);
-  Scheduler::master->addCommand(new TurnToHeadingCommand(PI, true, 210, 0.01));
+  Scheduler::master->addCommand(new TurnToHeadingCommand(PI, true, 220, 0.01, 3000));
 
   // Run selftest
   Drivetrain::resetPosition();

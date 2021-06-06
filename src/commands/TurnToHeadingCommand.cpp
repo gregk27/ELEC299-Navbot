@@ -4,12 +4,13 @@
 
 float TurnToHeadingCommand::kP_POS = 0;
 
-TurnToHeadingCommand::TurnToHeadingCommand(float target, bool absolute, int speed, float tol)
-  :controller(1000, 0, 0, PID::Direct) {
+TurnToHeadingCommand::TurnToHeadingCommand(float target, bool absolute, int speed, float tol, unsigned long timeout)
+  :controller(400, 2, 25, PID::Direct) {
   this->target = target;
   this->absolute = absolute;
   this->speed = speed;
   this->tol = tol;
+  this->timeout = timeout;
 }
 
 void TurnToHeadingCommand::init(){
@@ -22,16 +23,23 @@ void TurnToHeadingCommand::init(){
 
   // Start the PID controller
   controller.Start(IMU::getPosition().heading, 0, target);
-  Serial.println("INIT");
+  controller.SetOutputLimits(-255, 255);
+
+  timeout += millis();
+  Serial.println(target);
 }
 
 void TurnToHeadingCommand::periodic(){
   float hdgOut = controller.Run(IMU::getPosition().heading);
-  Serial.print(hdgOut);
-  Serial.print("\t");
-  Serial.print(IMU::getPosition().heading);
-  Serial.print("\t");
-  Serial.println(controller.GetSetpoint());
+  // Serial.print(hdgOut);
+  // Serial.print("\t");
+  // Serial.print(IMU::getPosition().heading);
+  // Serial.print("\t");
+  // Serial.print(controller.GetSetpoint());
+  // Serial.print("\t");
+  // Serial.print(5);
+  // Serial.print("\t");
+  // Serial.println(-5);
   float lDelta = initialLeftPos - Drivetrain::leftEncoder->getPosition();
   float rDleta = initialRightPos - Drivetrain::rightEncoder->getPosition();
   float lrErr = abs(lDelta)-abs(rDleta);
@@ -43,5 +51,8 @@ void TurnToHeadingCommand::end(){
 }
 
 bool TurnToHeadingCommand::isFinished(){
-  return (abs(target-IMU::getPosition().heading) < tol);
+  // Serial.print(millis());
+  // Serial.print("\t");
+  // Serial.println(timeout);
+  return (abs(target-IMU::getPosition().heading) < tol) || millis() > timeout;
 }

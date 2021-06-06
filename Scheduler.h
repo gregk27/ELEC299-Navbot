@@ -9,6 +9,7 @@ class Scheduler: public Command{
 
     List<Command *> schedule;
     int currentCommand=0;
+    Command *interruptCommand = 0x0;
 
   public:
     static Scheduler *master;
@@ -25,6 +26,14 @@ class Scheduler: public Command{
      * @param command Pointer to the command to be added
     */
     void addCommand(Command *command);
+    /**
+     * Interrupt the currently running command with another
+     * Current command will resume upon completion
+     * An interrupt comnmand cannot be interrupted
+     * @param command The new command to run
+     * @return true if interrupt started, otherwise false
+    */
+    bool interrupt(Command *command);
     /**
      * Add a delay to the schedule
      * @param duration Duration of the delay, in ms

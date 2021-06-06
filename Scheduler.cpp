@@ -33,6 +33,13 @@ void Scheduler::addCommand(Command *command){
   schedule.add(command);
 }
 
+bool Scheduler::interrupt(Command *command){
+  if(interruptCommand) return false;
+  interruptCommand = command;
+  interruptCommand->init();
+  return true;
+}
+
 void Scheduler::addDelay(unsigned int duration){
   addCommand(new DelayCommand(duration));
 }
@@ -47,6 +54,8 @@ void Scheduler::periodic(){
   // Exit if schedule complete
   if(currentCommand >= schedule.size()) return;
   Command *c = schedule[currentCommand];
+  // Run interrupt command if active
+  if(interruptCommand) c = interruptCommand;
   // Call periodic function
   c->periodic();
   
@@ -55,12 +64,17 @@ void Scheduler::periodic(){
     // End the current command
     c->end();
     delete c;
-    // Initialise the next
-    currentCommand ++;
-    // Exit if schedule complete
-    if(currentCommand >= schedule.size()) return;
-    c = schedule[currentCommand];
-    c->init();
+    if(interruptCommand){
+      // If it's an interupt command, remove the dangling pointer
+      interruptCommand = 0x0;
+    } else {
+      // Initialise the next
+      currentCommand ++;
+      // Exit if schedule complete
+      if(currentCommand >= schedule.size()) return;
+      c = schedule[currentCommand];
+      c->init();
+    }
   }
 }
 

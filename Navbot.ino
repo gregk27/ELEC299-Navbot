@@ -56,19 +56,6 @@ void loop() {
   while(Scheduler::master->isFinished());
 }
 
-void driveHeading(int speed, float hdg){
-  IMU::Position pos = IMU::getPosition();
-  float err = hdg-pos.heading;
-  // Serial.println(err);
-  Drivetrain::setOutput(speed - err*500, speed + err*500);
-}
-
-void pivotHeading(int heading){
-  IMU::Position pos = IMU::getPosition();
-  float err = heading-pos.heading;
-  Drivetrain::setOutput(err*250, -err*250);
-}
-
 int testState = 0;
 
 /**

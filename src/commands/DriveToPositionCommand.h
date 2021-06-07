@@ -10,16 +10,12 @@ class DriveToPositionCommand: public Command {
     float targetX;
     float targetY;
     float tol;
-    int speed;
-    int accumErr;
+    byte speed;
 
     PID_v2 controller;
 
-    static float kP;
-    static float kI;
-
   public:
-    DriveToPositionCommand(float x, float y, int speed, float tol);
+    DriveToPositionCommand(float x, float y, byte speed, float tol);
 
     void init() override;
     void periodic() override;

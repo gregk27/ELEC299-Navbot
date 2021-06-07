@@ -8,21 +8,19 @@ using namespace IMU;
 // List declared in ino file
 extern List<Position> path;
 
-float DriveToPositionCommand::kP = 250;
-float DriveToPositionCommand::kI = 10;
 
-DriveToPositionCommand::DriveToPositionCommand(float x, float y, int speed, float tol)
+DriveToPositionCommand::DriveToPositionCommand(float x, float y, byte speed, float tol)
   :controller(150, 10, 25, PID::Direct){
   targetX = x;
   targetY = y;
   this->tol = tol;
   this->speed = speed;
-  accumErr = 0;
 }
 
 void DriveToPositionCommand::init(){
   controller.Start(IMU::getPosition().heading, 0, headingTo(targetX, targetY));
   controller.SetOutputLimits(-255, 255);
+  Serial.println("INIT");
 }
 
 void DriveToPositionCommand::periodic(){
@@ -34,10 +32,10 @@ void DriveToPositionCommand::periodic(){
   float target = headingTo(targetX, targetY);
   controller.Setpoint(target);
   float correctOut = controller.Run(pos.heading);
-  // If more than 90 degrees off, pivot to a more reasonable heading
-  if(abs(target-pos.heading) > PI/2){
-    Scheduler::master->interrupt(new TurnToHeadingCommand(target-pos.heading, false, 200, 0.5, 3000));
-    Drivetrain::setOutput(0, 0);
+  // If more than 60 degrees off, pivot to a more reasonable heading
+  if(abs(target-pos.heading) > PI/3){
+    // Scheduler::master->interrupt(new TurnToHeadingCommand(target-pos.heading, false, 200, 0.5, 3000));
+    Drivetrain::setOutput(-correctOut, correctOut);
   } else {
     Drivetrain::setOutput(speed-correctOut, speed+correctOut);
   }

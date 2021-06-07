@@ -14,7 +14,7 @@ class Scheduler: public Command{
   public:
     static Scheduler *master;
 
-    Scheduler();
+    Scheduler(int maxCommands);
 
     void init() override;
     void periodic() override;

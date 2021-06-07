@@ -24,8 +24,8 @@ class DelayCommand: public Command {
 
 Scheduler *Scheduler::master = 0x0;
 
-Scheduler::Scheduler(){
-  schedule = List<Command *>();
+Scheduler::Scheduler(int maxCommands)
+  :schedule(maxCommands){
   currentCommand = 0;
 }
 
@@ -37,6 +37,8 @@ bool Scheduler::interrupt(Command *command){
   if(interruptCommand) return false;
   interruptCommand = command;
   interruptCommand->init();
+  Serial.print("INTERRUPT: ");
+  Serial.println((unsigned long) command);
   return true;
 }
 
@@ -56,6 +58,7 @@ void Scheduler::periodic(){
   Command *c = schedule[currentCommand];
   // Run interrupt command if active
   if(interruptCommand) c = interruptCommand;
+  // Serial.println((unsigned long) c);
   // Call periodic function
   c->periodic();
   
@@ -70,6 +73,10 @@ void Scheduler::periodic(){
     } else {
       // Initialise the next
       currentCommand ++;
+      Serial.print("Finished command: ");
+      Serial.print(currentCommand);
+      Serial.print("/");
+      Serial.println(schedule.size());
       // Exit if schedule complete
       if(currentCommand >= schedule.size()) return;
       c = schedule[currentCommand];

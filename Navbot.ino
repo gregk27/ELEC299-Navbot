@@ -9,26 +9,40 @@
 #include "./src/commands/TurnToHeadingCommand.h"
 #include "./src/commands/ComputePathCommand.h"
 
-
 /**
  * List of positions build while travelling, used to generate return path
 */
-List<IMU::Position> path = List<IMU::Position>();
+List<IMU::Position> path = List<IMU::Position>(8);
+
+DriveToPositionCommand driveOutCommand(0, 100, 200, 10);
+DriveToPositionCommand driveSidewaysCommand(-50, 100, 200, 10);
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting");
 
+  Serial.println("Sizes");
+  Serial.print("Pointer: ");
+  Serial.println(sizeof(void*));
+  Serial.print("DriveToPositionCommand: ");
+  Serial.println(sizeof(DriveToPositionCommand));
+  Serial.print("TurnToHeadingCommand: ");
+  Serial.println(sizeof(TurnToHeadingCommand));
+  Serial.print("ComputePathCommand: ");
+  Serial.println(sizeof(ComputePathCommand));
+  Serial.print("Scheduler: ");
+  Serial.println(sizeof(Scheduler));
+
   Drivetrain::init(1, 3, 3, 2);
   Drivetrain::setOutput(0,0);
   Sensors::init();
   
-  Scheduler::master = new Scheduler();
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 100, 200, 10));
+  Scheduler::master = new Scheduler(32);
+  Scheduler::master->addCommand(&driveOutCommand);
   Scheduler::master->addDelay(1000);
-  Scheduler::master->addCommand(new DriveToPositionCommand(-50, 100, 200, 10));
-  Scheduler::master->addDelay(1000);
-  Scheduler::master->addCommand(new ComputePathCommand(&path));
+  Scheduler::master->addCommand(&driveSidewaysCommand);
+  // Scheduler::master->addDelay(1000);
+  // Scheduler::master->addCommand(new ComputePathCommand(&path));
 
   // Scheduler::master->addCommand(new TurnToHeadingCommand(PI/2, false, 220, 0.01, 3000));
   // Scheduler::master->addDelay(1000);
@@ -42,8 +56,11 @@ void setup() {
   IMU::init();
 
 
-  Scheduler::master->init();
+  while(!Sensors::getRightIR()->getSmoothed()){}
   delay(1000);
+
+  Scheduler::master->init();
+  Serial.println(freeMemory());
 }
 
 float holdHeading;
@@ -60,10 +77,12 @@ void loop() {
   //  Act
   // -----
   Scheduler::master->periodic();
-  Serial.println(freeMemory());
   // IMU::toPlot();
   // Hang when done
-  while(Scheduler::master->isFinished());
+  if(Scheduler::master->isFinished()){
+    Serial.println("Done");
+    while(1){};
+  };
   delay(20);
 }
 

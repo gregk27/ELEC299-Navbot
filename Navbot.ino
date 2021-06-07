@@ -14,8 +14,10 @@
 */
 List<IMU::Position> path = List<IMU::Position>(8);
 
-DriveToPositionCommand driveOutCommand(0, 100, 200, 10);
-DriveToPositionCommand driveSidewaysCommand(-50, 100, 200, 10);
+PID_v2 pid1(0,0,0,PID::Direct);
+
+DriveToPositionCommand driveOutCommand(0, 100, 200, 10, &pid1);
+DriveToPositionCommand driveSidewaysCommand(-50, 100, 200, 10, &pid1);
 
 void setup() {
   Serial.begin(115200);
@@ -42,7 +44,7 @@ void setup() {
   Scheduler::master->addDelay(1000);
   Scheduler::master->addCommand(&driveSidewaysCommand);
   // Scheduler::master->addDelay(1000);
-  // Scheduler::master->addCommand(new ComputePathCommand(&path));
+  // Scheduler::master->addCommand(new ComputePathCommand(&path, &pid1));
 
   // Scheduler::master->addCommand(new TurnToHeadingCommand(PI/2, false, 220, 0.01, 3000));
   // Scheduler::master->addDelay(1000);

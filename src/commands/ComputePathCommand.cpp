@@ -3,8 +3,9 @@
 #include "../../Scheduler.h"
 #include "../utils/MemoryFree.h"
 
-ComputePathCommand::ComputePathCommand(List<IMU::Position> *path){
+ComputePathCommand::ComputePathCommand(List<IMU::Position> *path, PID_v2 *controller){
   this->path = path;
+  this->controller = controller;
 }
 
 void ComputePathCommand::init(){
@@ -18,10 +19,10 @@ void ComputePathCommand::init(){
     Serial.println(pos.y);
     delay(100);
     Serial.println(freeMemory());
-    Scheduler::master->addCommand(new DriveToPositionCommand(pos.x, pos.y, 150, 10));
+    Scheduler::master->addCommand(new DriveToPositionCommand(pos.x, pos.y, 150, 10, controller));
   }
   // Add command to drive to start from first point
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 0, 200, 1));
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 0, 200, 1, controller));
 }
 
 bool ComputePathCommand::isFinished(){

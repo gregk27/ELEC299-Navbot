@@ -26,7 +26,7 @@ void TurnToHeadingCommand::init(){
   controller.SetOutputLimits(-255, 255);
 
   timeout += millis();
-  Serial.println(target);
+  // Serial.println(target);
 }
 
 void TurnToHeadingCommand::periodic(){

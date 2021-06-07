@@ -2,8 +2,10 @@
 #include "./src/hardware/Sensors.h"
 #include "./src/hardware/IMU.h"
 #include "./src/utils/List.h"
-#include "./src/utils/MemoryFree.h"
+#include "./src/utils/memtest.h"
 #include "./Scheduler.h"
+
+#include <PID_v2.h>
 
 #include "./src/commands/DriveToPositionCommand.h"
 #include "./src/commands/TurnToHeadingCommand.h"
@@ -12,10 +14,13 @@
 /**
  * List of positions build while travelling, used to generate return path
 */
-List<IMU::Position> path = List<IMU::Position>(8);
+List<IMU::Position> path = List<IMU::Position>(16);
 
-DriveToPositionCommand driveOutCommand(0, 100, 200, 10);
-DriveToPositionCommand driveSidewaysCommand(-50, 100, 200, 10);
+PID_v2 pid1(0, 0, 0, PID::Direct);
+
+DriveToPositionCommand driveOutCommand(0, 100, 200, 10, &pid1);
+DriveToPositionCommand driveSidewaysCommand(-50, 200, 200, 10, &pid1);
+ComputePathCommand computePath(&path, &pid1);
 
 void setup() {
   Serial.begin(115200);
@@ -24,6 +29,8 @@ void setup() {
   Serial.println("Sizes");
   Serial.print("Pointer: ");
   Serial.println(sizeof(void*));
+  Serial.print("Position: ");
+  Serial.println(sizeof(IMU::Position));
   Serial.print("DriveToPositionCommand: ");
   Serial.println(sizeof(DriveToPositionCommand));
   Serial.print("TurnToHeadingCommand: ");
@@ -41,8 +48,9 @@ void setup() {
   Scheduler::master->addCommand(&driveOutCommand);
   Scheduler::master->addDelay(1000);
   Scheduler::master->addCommand(&driveSidewaysCommand);
-  // Scheduler::master->addDelay(1000);
-  // Scheduler::master->addCommand(new ComputePathCommand(&path));
+  Scheduler::master->addDelay(1000);
+  Scheduler::master->addCommand(&computePath);
+  Scheduler::master->addDelay(1000);
 
   // Scheduler::master->addCommand(new TurnToHeadingCommand(PI/2, false, 220, 0.01, 3000));
   // Scheduler::master->addDelay(1000);
@@ -55,12 +63,11 @@ void setup() {
 
   IMU::init();
 
-
-  while(!Sensors::getRightIR()->getSmoothed()){}
   delay(1000);
 
   Scheduler::master->init();
-  Serial.println(freeMemory());
+  Serial.print("Initial memory: ");
+  Serial.println(memtest());
 }
 
 float holdHeading;
@@ -83,7 +90,7 @@ void loop() {
     Serial.println("Done");
     while(1){};
   };
-  delay(20);
+  delay(100);
 }
 
 int testState = 0;

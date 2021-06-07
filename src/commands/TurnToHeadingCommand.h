@@ -10,17 +10,17 @@ class TurnToHeadingCommand: public Command {
     float target;
     bool absolute;
     float tol;
-    int speed;
+    byte speed;
     
     PID_v2 controller;
     int initialLeftPos;
     int initialRightPos;
 
-    unsigned long timeout;
+    unsigned int timeout;
     static float kP_POS;
 
   public:
-    TurnToHeadingCommand(float target, bool absolute, int speed, float tol, unsigned long timeout);
+    TurnToHeadingCommand(float target, bool absolute, byte speed, float tol, unsigned int timeout);
 
     void init() override;
     void periodic() override;

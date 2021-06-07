@@ -4,7 +4,7 @@
 
 float TurnToHeadingCommand::kP_POS = 0;
 
-TurnToHeadingCommand::TurnToHeadingCommand(float target, bool absolute, int speed, float tol, unsigned long timeout)
+TurnToHeadingCommand::TurnToHeadingCommand(float target, bool absolute, byte speed, float tol, unsigned int timeout)
   :controller(400, 2, 25, PID::Direct) {
   this->target = target;
   this->absolute = absolute;

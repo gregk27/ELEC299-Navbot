@@ -1,6 +1,7 @@
 #ifndef COMPUTEPATHCOMMAND_H
 #define COMPUTEPATHCOMMAND_H
 
+#include <PID_v2.h>
 #include "./Command.h"
 #include "../hardware/IMU.h"
 #include "../utils/List.h"
@@ -12,9 +13,10 @@
 class ComputePathCommand: public Command {
   private:
     List<IMU::Position> *path;
+    PID_v2 *controller;
 
   public:
-    ComputePathCommand(List<IMU::Position> *path);
+    ComputePathCommand(List<IMU::Position> *path, PID_v2 *controller);
 
     void init() override;
     bool isFinished() override;

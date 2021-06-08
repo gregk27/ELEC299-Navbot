@@ -43,6 +43,21 @@ class List {
         numElements --;
       }
     }
+    
+    /**
+     * Reverse list contents
+    */
+    void reverse(){
+      T temp;
+      int len = size()-1;
+      for(int i=0; i<size()/2; i++){
+        if(i != len-i){
+          temp = elements[i];
+          elements[i] = elements[len-i];
+          elements[len-i] = temp;
+        }
+      }
+    }
 
     /**
      * Get the size of the list

@@ -7,33 +7,35 @@
 
 #include "./src/commands/DriveToPositionCommand.h"
 #include "./src/commands/TurnToHeadingCommand.h"
-#include "./src/commands/ComputePathCommand.h"
+#include "./src/commands/DrivePathCommand.h"
 
 /**
  * List of positions build while travelling, used to generate return path
 */
-List<IMU::Position> path = List<IMU::Position>(8);
+List<IMU::Position> path = List<IMU::Position>(32);
 
 PID_v2 pid1(0,0,0,PID::Direct);
 
 DriveToPositionCommand driveOutCommand(0, 100, 200, 10, &pid1);
 DriveToPositionCommand driveSidewaysCommand(-50, 100, 200, 10, &pid1);
+DrivePathCommand driveBackCommand(&path, true, 200, 15, &pid1);
+DriveToPositionCommand driveToStopCommand(0, 0, 170, 5, &pid1);
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting");
 
-  Serial.println("Sizes");
-  Serial.print("Pointer: ");
-  Serial.println(sizeof(void*));
-  Serial.print("DriveToPositionCommand: ");
-  Serial.println(sizeof(DriveToPositionCommand));
-  Serial.print("TurnToHeadingCommand: ");
-  Serial.println(sizeof(TurnToHeadingCommand));
-  Serial.print("ComputePathCommand: ");
-  Serial.println(sizeof(ComputePathCommand));
-  Serial.print("Scheduler: ");
-  Serial.println(sizeof(Scheduler));
+  // Serial.println("Sizes");
+  // Serial.print("Pointer: ");
+  // Serial.println(sizeof(void*));
+  // Serial.print("DriveToPositionCommand: ");
+  // Serial.println(sizeof(DriveToPositionCommand));
+  // Serial.print("TurnToHeadingCommand: ");
+  // Serial.println(sizeof(TurnToHeadingCommand));
+  // Serial.print("ComputePathCommand: ");
+  // Serial.println(sizeof(ComputePathCommand));
+  // Serial.print("Scheduler: ");
+  // Serial.println(sizeof(Scheduler));
 
   Drivetrain::init(1, 3, 3, 2);
   Drivetrain::setOutput(0,0);
@@ -43,8 +45,10 @@ void setup() {
   Scheduler::master->addCommand(&driveOutCommand);
   Scheduler::master->addDelay(1000);
   Scheduler::master->addCommand(&driveSidewaysCommand);
-  // Scheduler::master->addDelay(1000);
-  // Scheduler::master->addCommand(new ComputePathCommand(&path, &pid1));
+  Scheduler::master->addDelay(1000);
+  Scheduler::master->addCommand(&driveBackCommand);
+  Scheduler::master->addDelay(1000);
+  Scheduler::master->addCommand(&driveToStopCommand);
 
   // Scheduler::master->addCommand(new TurnToHeadingCommand(PI/2, false, 220, 0.01, 3000));
   // Scheduler::master->addDelay(1000);
@@ -60,7 +64,7 @@ void setup() {
 
   while(!Sensors::getRightIR()->getSmoothed()){}
   delay(1000);
-
+  
   Scheduler::master->init();
   Serial.println(freeMemory());
 }
@@ -79,7 +83,7 @@ void loop() {
   //  Act
   // -----
   Scheduler::master->periodic();
-  // IMU::toPlot();
+  IMU::toPlot();
   // Hang when done
   if(Scheduler::master->isFinished()){
     Serial.println("Done");

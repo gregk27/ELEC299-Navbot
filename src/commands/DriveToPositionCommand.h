@@ -6,9 +6,10 @@
 #include "../hardware/IMU.h"
 
 class DriveToPositionCommand: public Command {
-  private:
+  protected:
     float targetX;
     float targetY;
+  private:
     float tol;
     byte speed;
 
@@ -17,10 +18,12 @@ class DriveToPositionCommand: public Command {
   public:
     DriveToPositionCommand(float x, float y, byte speed, float tol, PID_v2 *controller);
 
-    void init() override;
+    // Functions are virtual to allow for overriding
+    
+    virtual void init() override;
     void periodic() override;
     void end() override;
-    bool isFinished() override;
+    virtual bool isFinished() override;
 
 };
 

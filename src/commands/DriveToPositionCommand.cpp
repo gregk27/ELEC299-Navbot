@@ -18,10 +18,10 @@ DriveToPositionCommand::DriveToPositionCommand(float x, float y, byte speed, flo
 }
 
 void DriveToPositionCommand::init(){
-  controller->SetTunings(150, 10, 25);
-  controller->Start(IMU::getPosition().heading, 0, headingTo(targetX, targetY));
+  path.add(IMU::getPosition());
+  controller->SetTunings(150, 5, 20);
+  controller->Start(0, 0, 0);
   controller->SetOutputLimits(-255, 255);
-  Serial.println("INIT");
 }
 
 void DriveToPositionCommand::periodic(){
@@ -30,20 +30,17 @@ void DriveToPositionCommand::periodic(){
   if(millis() % 500 == 0){
     path.add(pos);
   }
-  float target = headingTo(targetX, targetY);
-  controller->Setpoint(target);
-  float correctOut = controller->Run(pos.heading);
-  // If more than 60 degrees off, pivot to a more reasonable heading
-  if(abs(target-pos.heading) > PI/3){
-    // Scheduler::master->interrupt(new TurnToHeadingCommand(target-pos.heading, false, 200, 0.5, 3000));
-    Drivetrain::setOutput(-correctOut, correctOut);
+  float err = angleTo(headingTo(targetX, targetY));
+  float correctOut = controller->Run(err);
+  // If more than 45 degrees off, pivot to a more reasonable heading
+  if(abs(err) > PI/2){
+    Drivetrain::setOutput(correctOut, -correctOut, speed);
   } else {
-    Drivetrain::setOutput(speed-correctOut, speed+correctOut);
+    Drivetrain::setOutput(speed+correctOut, speed-correctOut);
   }
 }
 
 void DriveToPositionCommand::end() {
-  path.add(IMU::getPosition());
   Drivetrain::setOutput(0, 0);
 }
 

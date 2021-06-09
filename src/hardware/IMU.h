@@ -34,6 +34,8 @@ namespace IMU {
    * @return The heading in radians facing the point
   */
   float headingTo(float x, float y);
+
+  float angleTo(float h);
 }
 
 #endif

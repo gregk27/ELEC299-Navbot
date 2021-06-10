@@ -5,20 +5,19 @@
 #include "./TurnToHeadingCommand.h"
 
 using namespace IMU;
-// List declared in ino file
-extern List<Position> path;
 
 
-DriveToPositionCommand::DriveToPositionCommand(float x, float y, byte speed, float tol, PID_v2 *controller){
+DriveToPositionCommand::DriveToPositionCommand(float x, float y, byte speed, float tol, PID_v2 *controller, List<Position> *path){
   targetX = x;
   targetY = y;
   this->tol = tol;
   this->speed = speed;
   this->controller = controller;
+  this->path = path;
 }
 
 void DriveToPositionCommand::init(){
-  path.add(IMU::getPosition());
+  if(path) path->add(IMU::getPosition());
   controller->SetTunings(150, 5, 20);
   controller->Start(0, 0, 0);
   controller->SetOutputLimits(-255, 255);
@@ -27,8 +26,8 @@ void DriveToPositionCommand::init(){
 void DriveToPositionCommand::periodic(){
   Position pos = getPosition();
   // Save position every 500 ms
-  if(millis() % 500 == 0){
-    path.add(pos);
+  if(millis() % 500 == 0 && path){
+    path->add(pos);
   }
   float err = angleTo(headingTo(targetX, targetY));
   float correctOut = controller->Run(err);

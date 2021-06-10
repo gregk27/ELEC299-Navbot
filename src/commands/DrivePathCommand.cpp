@@ -1,7 +1,7 @@
 #include "./DrivePathCommand.h"
 
 DrivePathCommand::DrivePathCommand(List<IMU::Position> *path, bool reverse, byte speed, float tol, PID_v2 *controller)
-: DriveToPositionCommand(0, 0, speed, tol, controller){
+: DriveToPositionCommand(0, 0, speed, tol, controller, 0x0){
   this->path = path; 
   this->reverse = reverse;
 }
@@ -21,6 +21,7 @@ void DrivePathCommand::init(){
     path->reverse();
   }
   DriveToPositionCommand::init();
+  idx = 0;
   setTargetNode(0);
 }
 

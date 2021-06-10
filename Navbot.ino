@@ -34,6 +34,18 @@ void setup() {
 
   // Schedule main navigation commands
   Scheduler::master->addCommand(new DriveToPositionCommand(0, 100, 220, 20, &pid1, &path));
+  Scheduler::master->addCommand(new DriveToPositionCommand(-50, 125, 200, 10, &pid1, &path));
+  Scheduler::master->addCommand(new DriveToPositionCommand(50, 175, 200, 10, &pid1, &path));
+  Scheduler::master->addCommand(new DrivePathCommand(&path, true, 200, 15, &pid1));
+ 
+ 
+  // Run selftest
+  while(selfTest()){};
+
+  // Final setup
+  delay(1000);
+  Drivetrain::resetPosition();
+  IMU::init();
   Scheduler::master->init();
 }
 

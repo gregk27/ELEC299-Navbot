@@ -4,8 +4,8 @@
 
 float TurnToHeadingCommand::kP_POS = 0;
 
-TurnToHeadingCommand::TurnToHeadingCommand(float target, bool absolute, byte speed, float tol, unsigned int timeout)
-  :controller(400, 2, 25, PID::Direct) {
+TurnToHeadingCommand::TurnToHeadingCommand(float target, bool absolute, int speed, float tol, unsigned long timeout)
+  :controller(200, 2, 25, PID::Direct) {
   this->target = target;
   this->absolute = absolute;
   this->speed = speed;
@@ -22,7 +22,7 @@ void TurnToHeadingCommand::init(){
   if(!absolute) target += IMU::getPosition().heading;
 
   // Start the PID controller
-  controller.Start(IMU::getPosition().heading, 0, target);
+  controller.Start(IMU::getPosition().heading, 0, 0);
   controller.SetOutputLimits(-255, 255);
 
   timeout += millis();
@@ -30,13 +30,14 @@ void TurnToHeadingCommand::init(){
 }
 
 void TurnToHeadingCommand::periodic(){
-  float hdgOut = controller.Run(IMU::getPosition().heading);
-  // Serial.print(hdgOut);
-  // Serial.print("\t");
-  // Serial.print(IMU::getPosition().heading);
-  // Serial.print("\t");
-  // Serial.print(controller.GetSetpoint());
-  // Serial.print("\t");
+  float hdgOut = controller.Run(IMU::angleTo(target));
+  Serial.print(hdgOut);
+  Serial.print("\t");
+  Serial.print(IMU::getPosition().heading);
+  Serial.print("\t");
+  Serial.print(IMU::angleTo(target));
+  Serial.print("\t");
+  Serial.println(controller.GetSetpoint());
   // Serial.print(5);
   // Serial.print("\t");
   // Serial.println(-5);
@@ -54,5 +55,5 @@ bool TurnToHeadingCommand::isFinished(){
   // Serial.print(millis());
   // Serial.print("\t");
   // Serial.println(timeout);
-  return (abs(target-IMU::getPosition().heading) < tol) || millis() > timeout;
+  return (abs(target-IMU::getPosition().heading) < tol);// || millis() > timeout;
 }

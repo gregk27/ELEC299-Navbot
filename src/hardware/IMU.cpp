@@ -1,6 +1,7 @@
 #include "./IMU.h"
 #include <Arduino.h>
 #include "./Drivetrain.h"
+#include "./Gyro.h"
 
 // Positional computations taken from: https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-186-mobile-autonomous-systems-laboratory-january-iap-2005/study-materials/odomtutorial.pdf
 
@@ -30,11 +31,10 @@ ISR(TIMER1_COMPB_vect){
   lastRight = Drivetrain::rightEncoder->getPositionCm();
 
   float dCentre = (dLeft+dRight)/2.0;
-  float phi = (dRight-dLeft)/WIDTH;
 
   pos.x += dCentre*sin(pos.heading);
   pos.y += dCentre*cos(pos.heading);
-  pos.heading += phi;
+  pos.heading = Gyro::getYaw()->getSmoothed();
 }
 
 // -------------------
@@ -73,4 +73,11 @@ void IMU::toPlot(){
 
 float IMU::headingTo(float x, float y){
   return atan2((x-pos.x)*2, y-pos.y);
+}
+
+float IMU::angleTo(float h){
+  float err = h-pos.heading;
+  if(err > PI) return err-2*PI;
+  else if (err < -PI) return err+2*PI;
+  else return err;
 }

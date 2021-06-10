@@ -2,11 +2,12 @@
 #include <Arduino.h>
 #include "../utils/SmoothedValue.h"
 
-#define LEFT_IR_PIN A3
-#define RIGHT_IR_PIN A2
+// TODO: Confirm pin order
+#define LEFT_IR_PIN 9
+#define RIGHT_IR_PIN 10
 
-#define US_ECHO_PIN A4
-#define US_TRIG_PIN A5
+#define US_ECHO_PIN A3
+#define US_TRIG_PIN A2
 #define US_MIN_INTERVAL 60
 #define US_DURATION_TO_DISTANCE 0.01724137931 // 1/58, from docs
 
@@ -73,6 +74,8 @@ void Sensors::init(){
   digitalWrite(US_TRIG_PIN, LOW);
 
   pinMode(DS_PIN, INPUT);
+
+  Gyro::init();
 }
 
 void Sensors::periodic(){
@@ -96,6 +99,7 @@ void Sensors::periodic(){
   }
 
   downward.addSample(analogRead(DS_PIN));
+  Gyro::periodic();
 }
 
 SmoothedValue<bool>* Sensors::getLeftIR(){

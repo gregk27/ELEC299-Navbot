@@ -1,6 +1,7 @@
 #ifndef SENSORS_H
 #define SENSORS_H
 #include "../utils/SmoothedValue.h"
+#include "./Gyro.h"
 
 namespace Sensors {
 

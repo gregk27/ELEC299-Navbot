@@ -4,8 +4,8 @@ The coordiante system used is:
 ```
 ^ y
 │
-│  ╭─̬╮ heading
-│  ╰─╯
+│  ╭─╮ heading
+│  ╰─̂╯
 └────────> x
 ```
 ## Sensor Configuration
@@ -42,6 +42,19 @@ Indicates obstacle is 45° off right, but not in ultrasonic FoV
  - Pivot left
 
 ## Case 0: No detections
-Inidicates that robot should continue to goal
- - Calculate heading to goal
+Inidicates that robot should continue to goal, using the following sequence
+### Heading out
+ - Calculate heading to 3m goal
+ - Drive heading
+ - Save position (x, y) to array periodically ("breadcrumbs")
+### At 3m goal
+ - Turn left 90°
+ - Drive forward 0.5m
+ - Goto search pattern
+### Search Pattern
+ - Turn 180
+ - Drive ahead 1m
+ - If the marker is hit, goto return path
+### Return Path
+ - Calculate heading to next breadcrumb on reverse path
  - Drive heading

@@ -3,7 +3,7 @@
 #include "../utils/List.h"
 
 /** Array of encoders to have periodic functions called */
-List<Encoder *> encoders = List<Encoder *>();
+List<Encoder *> encoders = List<Encoder *>(2);
 
 // Set speed interval to 250 ms
 int Encoder::speedInterval = 250;

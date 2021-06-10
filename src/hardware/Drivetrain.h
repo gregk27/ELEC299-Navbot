@@ -35,7 +35,15 @@ namespace Drivetrain {
   /**
    * Set the motor output
    * @param l The output for the left motor, -255 to 255
-   * @param r THe output for the right motor, -255 to 255
+   * @param r The output for the right motor, -255 to 255
+   * @param max, The max speed to use
+  */
+  void setOutput(int l, int r, int max);
+
+  /**
+   * Set the motor output
+   * @param l The output for the left motor, -255 to 255
+   * @param r The output for the right motor, -255 to 255
   */
   void setOutput(int l, int r);
 

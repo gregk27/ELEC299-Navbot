@@ -1,26 +1,54 @@
 #include "./src/hardware/Drivetrain.h"
 #include "./src/hardware/Sensors.h"
 #include "./src/hardware/IMU.h"
+#include "./src/utils/List.h"
+#include "./Scheduler.h"
 
+#include <PID_v2.h>
+
+#include "./src/commands/DriveToPositionCommand.h"
+#include "./src/commands/TurnToHeadingCommand.h"
+#include "./src/commands/DrivePathCommand.h"
+
+/**
+ * List of positions build while travelling, used to generate return path
+*/
+List<IMU::Position> path = List<IMU::Position>(32);
+
+/**
+ * PID Controller shared by main navigation commands (saves alot of memory)
+*/
+PID_v2 pid1(0,0,0,PID::Direct);
 
 void setup() {
   Serial.begin(115200);
   Serial.println("Starting");
 
-  Drivetrain::init(1, 3, 3, 2);
+  //
+  Drivetrain::init(4, 3, 3, 2);
+  Drivetrain::setOutput(0,0);
   Sensors::init();
 
+  // Create Scheduler
+  Scheduler::master = new Scheduler(32);
 
+  // Schedule main navigation commands
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 100, 220, 20, &pid1, &path));
+  Scheduler::master->addCommand(new DriveToPositionCommand(-50, 125, 200, 10, &pid1, &path));
+  Scheduler::master->addCommand(new DriveToPositionCommand(50, 175, 200, 10, &pid1, &path));
+  Scheduler::master->addCommand(new DrivePathCommand(&path, true, 200, 15, &pid1));
+ 
+ 
   // Run selftest
-  // while(selfTest){};
-  Drivetrain::resetPosition();
+  while(selfTest()){};
 
-  IMU::init();
-
+  // Final setup
   delay(1000);
+  Drivetrain::resetPosition();
+  IMU::init();
+  Scheduler::master->init();
 }
 
-float holdHeading;
 
 void loop() {
   // -------
@@ -30,71 +58,19 @@ void loop() {
   IMU::Position pos = IMU::getPosition();
   float usDist = Sensors::getUltrasonicDistance()->getSmoothed();
 
-  // -------
-  //  Think
-  // -------
-  // Default to Case 0 operation
-  int mode = 0;
-  
-  // Select navigation mode
-  if(Sensors::isOnMarker()){
-    mode = 4;
-  } else if(Sensors::getLeftIR()->getSmoothed()) {
-    mode = 3;
-  } else if(usDist > 0 && usDist < 20){
-    mode = 2;
-  } else if(Sensors::getRightIR()->getSmoothed()){
-    mode = 1;
-  }
-
   // -----
   //  Act
   // -----
-  // Output location for plotting
+  // Run scheduler
+  Scheduler::master->periodic();
   // IMU::toPlot();
-  Serial.println(mode);
 
-  switch(mode){
-  case 4:
-    Drivetrain::setOutput(0,0);
-    break;
-  case 3:
-    driveHeading(100, pos.heading+1);
-    break;
-  case 2:
-    if(usDist > 12){
-      driveHeading(210, pos.heading+(13-usDist)*0.05);
-      holdHeading = pos.heading;
-    } else if (usDist < 7){
-      driveHeading(210, pos.heading+(8-usDist)*0.05);
-      holdHeading = pos.heading;
-    } else {
-      driveHeading(210, holdHeading);
-    }
-    break;
-  case 1:
-    driveHeading(100, pos.heading+1);
-    break;
-  case 0:
-    driveHeading(225, IMU::headingTo(0, 200));
-    break;
-  default: // If none of the cases, something is wrong
-    Drivetrain::setOutput(0, 0);
-  }
-
-}
-
-void driveHeading(int speed, float hdg){
-  IMU::Position pos = IMU::getPosition();
-  float err = hdg-pos.heading;
-  // Serial.println(err);
-  Drivetrain::setOutput(speed - err*500, speed + err*500);
-}
-
-void pivotHeading(int heading){
-  IMU::Position pos = IMU::getPosition();
-  float err = heading-pos.heading;
-  Drivetrain::setOutput(err*250, -err*250);
+  // Hang when done
+  if(Scheduler::master->isFinished()){
+    Serial.println("Done");
+    while(1){};
+  };
+  delay(100);
 }
 
 int testState = 0;

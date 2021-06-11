@@ -7,19 +7,6 @@
 using namespace Sensors;
 extern List<IMU::Position> path;
 
-void AvoidanceCommand::driveHeading(int speed, float hdg){
-  IMU::Position pos = IMU::getPosition();
-  float err = hdg-pos.heading;
-  // Serial.println(err);
-  Drivetrain::setOutput(speed - err*500, speed + err*500);
-}
-
-void AvoidanceCommand::pivotHeading(int heading){
-  IMU::Position pos = IMU::getPosition();
-  float err = heading-pos.heading;
-  Drivetrain::setOutput(err*250, -err*250);
-}
-
 AvoidanceCommand::AvoidanceCommand(){
 }
 
@@ -28,30 +15,28 @@ void AvoidanceCommand::init(){
   holdHeading = pos.heading;
   // Remove the last path position to increase clearance of obstacle
   path.pop();
+  Drivetrain::setOutput(0,0);
+  // while(1);
 }
 
 void AvoidanceCommand::periodic(){
-  float usDist = getUltrasonicDistance()->getSmoothed();
-  IMU::Position pos = IMU::getPosition();
-  if(getLeftIR()->getSmoothed()){
-    driveHeading(100, pos.heading+1);
+  float usDist = getUltrasonicDistance()->getLast();
+  Serial.println(usDist);
+  if(getLeftIR()->getLast()){
+    Drivetrain::setOutput(0, 175);
   } else if(usDist > 0 && usDist < 20){
     // TODO: Increase cleareance to allow for sloppy positional tracking
     // Save path around obstacle for return path
     if(millis() % 250 == 0){
-      path.add(pos);
+      path.add(IMU::getPosition());
     }
-    if(usDist > 12){
-      driveHeading(210, pos.heading+(13-usDist)*0.05);
-      holdHeading = pos.heading;
-    } else if (usDist < 7){
-      driveHeading(210, pos.heading+(8-usDist)*0.05);
-      holdHeading = pos.heading;
-    } else {
-      driveHeading(210, holdHeading);
-    }
-  } else if(getRightIR()->getSmoothed()){
-    driveHeading(100, pos.heading+1);
+    // Exponential error to prevent overcorrecting
+    float err = pow(15-usDist, 3)*0.1;
+    Drivetrain::setOutput(200-err, 200+err);
+  } else if(getRightIR()->getLast()){
+    Drivetrain::setOutput(0, 175);
+  } else {
+    
   }
 }
 

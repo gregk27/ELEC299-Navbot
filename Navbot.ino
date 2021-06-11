@@ -9,6 +9,7 @@
 #include "./src/commands/DriveToPositionCommand.h"
 #include "./src/commands/TurnToHeadingCommand.h"
 #include "./src/commands/DrivePathCommand.h"
+#include "./src/commands/AvoidanceCommand.h"
 
 /**
  * List of positions build while travelling, used to generate return path
@@ -19,6 +20,12 @@ List<IMU::Position> path = List<IMU::Position>(32);
  * PID Controller shared by main navigation commands (saves alot of memory)
 */
 PID_v2 pid1(0,0,0,PID::Direct);
+
+/**
+ * Command used for avoidance routine
+ * Instantiated once to reduce memory use
+*/
+AvoidanceCommand *avoidance = new AvoidanceCommand();
 
 void setup() {
   Serial.begin(115200);
@@ -37,10 +44,11 @@ void setup() {
   Scheduler::master->addCommand(new DriveToPositionCommand(-50, 125, 200, 10, &pid1, &path));
   Scheduler::master->addCommand(new DriveToPositionCommand(50, 175, 200, 10, &pid1, &path));
   Scheduler::master->addCommand(new DrivePathCommand(&path, true, 200, 15, &pid1));
+  // Scheduler::master->addCommand(new AvoidanceCommand());
  
  
   // Run selftest
-  while(selfTest()){};
+  // while(selfTest()){};
 
   // Final setup
   delay(1000);
@@ -57,6 +65,21 @@ void loop() {
   Sensors::periodic();
   IMU::Position pos = IMU::getPosition();
   float usDist = Sensors::getUltrasonicDistance()->getSmoothed();
+  Serial.println("LOOP");
+
+  // -------
+  //  Think
+  // -------
+  Serial.print(Sensors::getLeftIR()->getSmoothed());
+  Serial.print("\t");
+  Serial.print(Sensors::getRightIR()->getSmoothed());
+  Serial.print("\t");
+  Serial.println(usDist);
+  // If there is an obstacle detected, interrupt scheduler with avoidance routine
+  if(Sensors::getLeftIR()->getSmoothed() || Sensors::getRightIR()->getSmoothed() || (usDist > 0 && usDist < 20)){
+    // Nothing will happen if there is already an interrupting command
+    Scheduler::master->interrupt(avoidance);
+  }
 
   // -----
   //  Act

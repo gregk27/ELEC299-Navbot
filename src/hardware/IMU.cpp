@@ -72,7 +72,7 @@ void IMU::toPlot(){
 }
 
 float IMU::headingTo(float x, float y){
-  return atan2((x-pos.x)*2, y-pos.y);
+  return atan2((x-pos.x), y-pos.y);
 }
 
 float IMU::angleTo(float h){

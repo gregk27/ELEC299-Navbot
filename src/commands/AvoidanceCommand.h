@@ -8,6 +8,8 @@ class AvoidanceCommand: public Command {
     float holdHeading;
     void driveHeading(int speed, float heading);
     void pivotHeading(int heading);
+    unsigned long timeout;
+    unsigned long endTimeout;
 
   public:
     AvoidanceCommand();
@@ -16,6 +18,8 @@ class AvoidanceCommand: public Command {
     void periodic() override;
     void end() override;
     bool isFinished() override;
+
+    bool isObstacle();
 
 };
 

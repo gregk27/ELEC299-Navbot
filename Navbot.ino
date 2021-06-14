@@ -40,10 +40,10 @@ void setup() {
   Scheduler::master = new Scheduler(32);
 
   // Schedule main navigation commands
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 100, 220, 20, &pid1, &path));
-  Scheduler::master->addCommand(new DriveToPositionCommand(-50, 125, 200, 10, &pid1, &path));
-  Scheduler::master->addCommand(new DriveToPositionCommand(50, 175, 200, 10, &pid1, &path));
-  Scheduler::master->addCommand(new DrivePathCommand(&path, true, 200, 15, &pid1));
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 300, 220, 20, &pid1, &path));
+  // Scheduler::master->addCommand(new DriveToPositionCommand(-50, 125, 200, 10, &pid1, &path));
+  // Scheduler::master->addCommand(new DriveToPositionCommand(50, 175, 200, 10, &pid1, &path));
+  // Scheduler::master->addCommand(new DrivePathCommand(&path, true, 200, 15, &pid1));
   // Scheduler::master->addCommand(new AvoidanceCommand());
  
  
@@ -65,18 +65,24 @@ void loop() {
   Sensors::periodic();
   IMU::Position pos = IMU::getPosition();
   float usDist = Sensors::getUltrasonicDistance()->getSmoothed();
-  Serial.println("LOOP");
+  // Serial.println("LOOP");
 
   // -------
   //  Think
   // -------
-  Serial.print(Sensors::getLeftIR()->getSmoothed());
-  Serial.print("\t");
-  Serial.print(Sensors::getRightIR()->getSmoothed());
-  Serial.print("\t");
-  Serial.println(usDist);
+  // Serial.print(Sensors::getLeftIR()->getSmoothed());
+  // Serial.print("\t");
+  // Serial.print(Sensors::getRightIR()->getSmoothed());
+  // Serial.print("\t");
+  // Serial.println(usDist);
   // If there is an obstacle detected, interrupt scheduler with avoidance routine
-  if(Sensors::getLeftIR()->getSmoothed() || Sensors::getRightIR()->getSmoothed() || (usDist > 0 && usDist < 20)){
+  if(avoidance->isObstacle()){//Sensors::getLeftIR()->getLast() || Sensors::getRightIR()->getLast()){//} || (usDist > 0 && usDist < 20)){
+    Serial.println("AVOID");
+    Serial.print(Sensors::getLeftIR()->getSmoothed());
+    Serial.print("\t");
+    Serial.print(Sensors::getRightIR()->getSmoothed());
+    Serial.print("\t");
+    Serial.println(usDist);
     // Nothing will happen if there is already an interrupting command
     Scheduler::master->interrupt(avoidance);
   }
@@ -86,7 +92,7 @@ void loop() {
   // -----
   // Run scheduler
   Scheduler::master->periodic();
-  // IMU::toPlot();
+  IMU::toPlot();
 
   // Hang when done
   if(Scheduler::master->isFinished()){

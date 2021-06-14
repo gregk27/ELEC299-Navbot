@@ -92,7 +92,7 @@ void Sensors::periodic(){
     delayMicroseconds(10);
     digitalWrite(US_TRIG_PIN, LOW);
 
-    int duration = pulseIn(US_ECHO_PIN, HIGH);
+    int duration = pulseIn(US_ECHO_PIN, HIGH, 8000);
     USLastCall = millis();
     // Return distance, capped at 50cm
     ultrasonic.addSample(duration * US_DURATION_TO_DISTANCE > 50 ? -2 : duration * US_DURATION_TO_DISTANCE);

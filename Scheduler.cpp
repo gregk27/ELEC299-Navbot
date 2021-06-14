@@ -66,7 +66,6 @@ void Scheduler::periodic(){
   if(c->isFinished()){
     // End the current command
     c->end();
-    delete c;
     if(interruptCommand){
       // If it's an interupt command, remove the dangling pointer
       interruptCommand = 0x0;

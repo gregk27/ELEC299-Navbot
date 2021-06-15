@@ -3,9 +3,23 @@
 #include "../hardware/IMU.h"
 #include "../hardware/Drivetrain.h"
 #include "../utils/List.h"
+#include "../../Scheduler.h"
 
 using namespace Sensors;
 extern List<IMU::Location> path;
+
+// Non-class function to save position on path
+void savePosition(){
+    IMU::Position pos = IMU::getPosition();
+    // Add the point left and behind of the vehicle to increase clearance
+    // Equations from https://gamedev.stackexchange.com/a/79779
+    int xOffset = -10;
+    int yOffset = 5;
+    path.add({
+      (int) (pos.x + cos(-pos.heading)*(xOffset) - sin(-pos.heading)*(yOffset)),
+      (int) (pos.y + cos(-pos.heading)*(yOffset) + sin(-pos.heading)*(xOffset))
+    });
+}
 
 AvoidanceCommand::AvoidanceCommand(){
 }
@@ -22,10 +36,13 @@ void AvoidanceCommand::init(){
 }
 
 void AvoidanceCommand::periodic(){
+  if(Scheduler::master->getIteration() % 50 == 0){
+    savePosition();
+  }
+
   // Support an internal timeout to improve reliability
   if(millis() < timeout) return;
   float usDist = getUltrasonicDistance()->getLast();
-  Serial.println(usDist);
   if(getLeftIR()->getLast()){
     Drivetrain::setOutput(-100, 175);
     endTimeout = millis() + 100;
@@ -50,7 +67,7 @@ void AvoidanceCommand::periodic(){
 void AvoidanceCommand::end(){
   Drivetrain::setOutput(0,0);
   // Add point at end of avoidance
-  path.add(IMU::getPosition());
+  savePosition();
 }
 
 bool AvoidanceCommand::isFinished(){

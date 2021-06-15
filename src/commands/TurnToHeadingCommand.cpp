@@ -13,6 +13,15 @@ TurnToHeadingCommand::TurnToHeadingCommand(float target, bool absolute, int spee
   this->controller = controller;
 }
 
+void TurnToHeadingCommand::setTarget(float target, bool absolute){
+  // Update variables
+  this->target = target;
+  this->absolute = absolute;
+    // If using a relative heading, then add the current one before proceeding
+  if(!absolute) target += IMU::getPosition().heading;
+}
+
+
 void TurnToHeadingCommand::init(){
   // Save initial encoder positions
   initialLeftPos = Drivetrain::leftEncoder->getPosition();

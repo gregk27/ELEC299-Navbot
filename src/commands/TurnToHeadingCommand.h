@@ -21,11 +21,13 @@ class TurnToHeadingCommand: public Command {
 
   public:
     TurnToHeadingCommand(float target, bool absolute, int speed, float tol, unsigned long timeout, PID_v2 *controller);
+    void setTarget(float target, bool absolute);
 
     void init() override;
     void periodic() override;
     void end() override;
     bool isFinished() override;
+
 
 };
 

@@ -41,10 +41,7 @@ void TurnToHeadingCommand::periodic(){
   // Serial.print(5);
   // Serial.print("\t");
   // Serial.println(-5);
-  float lDelta = initialLeftPos - Drivetrain::leftEncoder->getPosition();
-  float rDleta = initialRightPos - Drivetrain::rightEncoder->getPosition();
-  float lrErr = abs(lDelta)-abs(rDleta);
-  Drivetrain::setOutput(-hdgOut-lrErr*kP_POS, hdgOut+lrErr*kP_POS, speed);
+  Drivetrain::setOutput(hdgOut, -hdgOut, speed);
 }
 
 void TurnToHeadingCommand::end(){
@@ -55,5 +52,6 @@ bool TurnToHeadingCommand::isFinished(){
   // Serial.print(millis());
   // Serial.print("\t");
   // Serial.println(timeout);
-  return (abs(target-IMU::getPosition().heading) < tol);// || millis() > timeout;
+  Serial.println(IMU::angleTo(target));
+  return abs(IMU::angleTo(target)) < tol || millis() > timeout;
 }

@@ -26,7 +26,7 @@ void DriveToPositionCommand::init(){
 void DriveToPositionCommand::periodic(){
   Position pos = getPosition();
   // Save position every 500 ms
-  if(millis() % 500 == 0 && path){
+  if(Scheduler::master->getIteration() % 50 == 0 && path){
     path->add(pos);
   }
   float err = angleTo(headingTo(targetX, targetY));

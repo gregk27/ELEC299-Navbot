@@ -46,6 +46,10 @@ void Scheduler::addDelay(unsigned int duration){
   addCommand(new DelayCommand(duration));
 }
 
+unsigned int Scheduler::getIteration(){
+  return iteration;
+}
+
 void Scheduler::init() {
   if(currentCommand >= schedule.size()) return;
   Command *c = schedule[currentCommand];
@@ -55,6 +59,9 @@ void Scheduler::init() {
 void Scheduler::periodic(){
   // Exit if schedule complete
   if(currentCommand >= schedule.size()) return;
+  // Increment iteration counter
+  iteration ++;
+  
   Command *c = schedule[currentCommand];
   // Run interrupt command if active
   if(interruptCommand) c = interruptCommand;

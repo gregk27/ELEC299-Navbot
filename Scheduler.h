@@ -10,6 +10,7 @@ class Scheduler: public Command{
     List<Command *> schedule;
     int currentCommand=0;
     Command *interruptCommand = 0x0;
+    unsigned int iteration;
 
   public:
     static Scheduler *master;
@@ -39,6 +40,11 @@ class Scheduler: public Command{
      * @param duration Duration of the delay, in ms
     */
     void addDelay(unsigned int duration);
+
+    /**
+     * Get the number of iterations since starting
+    */
+    unsigned int getIteration();
 };
 
 #endif

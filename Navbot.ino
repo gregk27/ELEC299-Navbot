@@ -11,11 +11,16 @@
 #include "./src/commands/DrivePathCommand.h"
 #include "./src/commands/AvoidanceCommand.h"
 #include "./src/commands/SearchCommand.h"
+#include "./src/commands/ComputePathCommand.h"
 
 /**
  * List of positions build while travelling, used to generate return path
 */
 List<IMU::Position> path = List<IMU::Position>(32);
+/**
+ * List of position generatred by ComputePathCommand 
+*/
+List<IMU::Position> *retPath;
 
 /**
  * PID Controller shared by main navigation commands (saves alot of memory)
@@ -42,14 +47,16 @@ void setup() {
   Sensors::init();
 
   // Create Scheduler
-  Scheduler::master = new Scheduler(32);
+  Scheduler::master = new Scheduler(16);
 
   // Schedule main navigation commands
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 280, 220, 20, &pid1, &path));
-  Scheduler::master->addCommand(new SearchCommand(150, 0, 30, 20, &pid1, &pid2));
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 250, 220, 20, &pid1, &path));
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 300, 220, 5, &pid1, 0x0));
+  // Scheduler::master->addCommand(new SearchCommand(150, 0, 30, 20, &pid1, &pid2));
   // Scheduler::master->addCommand(new DriveToPositionCommand(-50, 125, 200, 10, &pid1, &path));
   // Scheduler::master->addCommand(new DriveToPositionCommand(50, 175, 200, 10, &pid1, &path));
-  Scheduler::master->addCommand(new DrivePathCommand(&path, true, 200, 15, &pid1));
+  Scheduler::master->addCommand(new ComputePathCommand(&path, retPath));
+  // Scheduler::master->addCommand(new DrivePathCommand(retPath, false, 200, 15, &pid1));
   // Scheduler::master->addCommand(new AvoidanceCommand());
  
  
@@ -98,14 +105,14 @@ void loop() {
   // -----
   // Run scheduler
   Scheduler::master->periodic();
-  IMU::toPlot();
+  // IMU::toPlot();
 
   // Hang when done
   if(Scheduler::master->isFinished()){
     Serial.println("Done");
     while(1){};
   };
-//delay(100);
+  delay(10);
 }
 
 int testState = 0;

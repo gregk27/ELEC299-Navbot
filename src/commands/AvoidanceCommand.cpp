@@ -5,7 +5,7 @@
 #include "../utils/List.h"
 
 using namespace Sensors;
-extern List<IMU::Position> path;
+extern List<IMU::Location> path;
 
 AvoidanceCommand::AvoidanceCommand(){
 }

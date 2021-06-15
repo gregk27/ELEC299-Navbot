@@ -5,7 +5,7 @@
 #define PATHIN (*pathIn)
 #define PATHOUT (*pathOut)
 
-ComputePathCommand::ComputePathCommand(List<IMU::Position> *pathIn, List<IMU::Position> *pathOut){
+ComputePathCommand::ComputePathCommand(List<IMU::Location> *pathIn, List<IMU::Location> *pathOut){
     this->pathIn = pathIn;
     this->pathOut = pathOut;
 }
@@ -26,13 +26,13 @@ void ComputePathCommand::init(){
     Serial.println(freeMemory());
     // Either initialise or re-initialise pathOut at same size as pathIn
     if(pathOut && pathOut->getCapacity() < count) delete pathOut;
-    pathOut = new List<IMU::Position>(count);
+    pathOut = new List<IMU::Location>(count);
 
     Serial.println("Allocation complete");
     Serial.println(freeMemory());
 
     // Start working from current position
-    IMU::Position current = PATHIN[count-1];
+    IMU::Location current = PATHIN[count-1];
     int currIdx = count-1;
 
     // Loop until first node found
@@ -44,7 +44,7 @@ void ComputePathCommand::init(){
         for(int i=0; i<count; i++){
             // Dont comare against self
             if(i == currIdx) continue;
-            IMU::Position tmp = PATHIN[i];
+            IMU::Location tmp = PATHIN[i];
             // Calculate angle between points, take negative due to orientation
             float angle = -atan2(current.y-tmp.y, current.x-tmp.x);
             // Adjust coordinate space

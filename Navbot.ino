@@ -16,11 +16,11 @@
 /**
  * List of positions build while travelling, used to generate return path
 */
-List<IMU::Position> path = List<IMU::Position>(32);
+List<IMU::Location> path = List<IMU::Location>(32);
 /**
  * List of position generatred by ComputePathCommand 
 */
-List<IMU::Position> *retPath;
+List<IMU::Location> *retPath;
 
 /**
  * PID Controller shared by main navigation commands (saves alot of memory)
@@ -50,8 +50,8 @@ void setup() {
   Scheduler::master = new Scheduler(16);
 
   // Schedule main navigation commands
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 250, 220, 20, &pid1, &path));
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 300, 220, 5, &pid1, 0x0));
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 150, 220, 20, &pid1, &path));
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 200, 220, 5, &pid1, 0x0));
   // Scheduler::master->addCommand(new SearchCommand(150, 0, 30, 20, &pid1, &pid2));
   // Scheduler::master->addCommand(new DriveToPositionCommand(-50, 125, 200, 10, &pid1, &path));
   // Scheduler::master->addCommand(new DriveToPositionCommand(50, 175, 200, 10, &pid1, &path));

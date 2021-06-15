@@ -17,10 +17,10 @@ class DriveToPositionCommand: public Command {
     float tol;
     byte speed;
 
-    List<IMU::Position> *path;
+    List<IMU::Location> *path;
 
   public:
-    DriveToPositionCommand(float x, float y, byte speed, float tol, PID_v2 *controller, List<IMU::Position> *path);
+    DriveToPositionCommand(float x, float y, byte speed, float tol, PID_v2 *controller, List<IMU::Location> *path);
 
     // Functions are virtual to allow for overriding
     

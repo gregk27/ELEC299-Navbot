@@ -7,7 +7,7 @@
 using namespace IMU;
 
 
-DriveToPositionCommand::DriveToPositionCommand(float x, float y, byte speed, float tol, PID_v2 *controller, List<Position> *path){
+DriveToPositionCommand::DriveToPositionCommand(float x, float y, byte speed, float tol, PID_v2 *controller, List<Location> *path){
   targetX = x;
   targetY = y;
   this->tol = tol;

@@ -3,12 +3,27 @@
 
 namespace IMU {
   /**
+   * Smaller struct holding basic location information, realtive to start
+  */
+ struct Location {
+   int x;
+   int y;
+ };
+
+  /**
    * Structure representing the robot's position, relative to start
   */
   struct Position {
     float x;
     float y;
     float heading;
+    
+    /**
+     * Automatically downcast to location when needed
+    */
+    operator Location() {
+      return {(int) x, (int) y};
+    }
   };
 
   /**

@@ -44,7 +44,7 @@ bool SmoothedValue<bool>::getSmoothed(){
 }
 
 int Sensors::USLastCall = 0;
-int Sensors::DSThreshold = 80;
+int Sensors::DSThreshold = 170;//80;
 
 SmoothedValue<bool> leftIR(5, SmoothFunctions::smoothBool);
 SmoothedValue<bool> rightIR(5, SmoothFunctions::smoothBool);

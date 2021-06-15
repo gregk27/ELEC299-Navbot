@@ -10,6 +10,7 @@
 #include "./src/commands/TurnToHeadingCommand.h"
 #include "./src/commands/DrivePathCommand.h"
 #include "./src/commands/AvoidanceCommand.h"
+#include "./src/commands/SearchCommand.h"
 
 /**
  * List of positions build while travelling, used to generate return path
@@ -20,6 +21,10 @@ List<IMU::Position> path = List<IMU::Position>(32);
  * PID Controller shared by main navigation commands (saves alot of memory)
 */
 PID_v2 pid1(0,0,0,PID::Direct);
+/**
+ * Secondary PID controller, used when primary already in use
+*/
+PID_v2 pid2(0,0,0,PID::Direct);
 
 /**
  * Command used for avoidance routine
@@ -40,10 +45,11 @@ void setup() {
   Scheduler::master = new Scheduler(32);
 
   // Schedule main navigation commands
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 300, 220, 20, &pid1, &path));
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 280, 220, 20, &pid1, &path));
+  Scheduler::master->addCommand(new SearchCommand(150, 0, 30, 20, &pid1, &pid2));
   // Scheduler::master->addCommand(new DriveToPositionCommand(-50, 125, 200, 10, &pid1, &path));
   // Scheduler::master->addCommand(new DriveToPositionCommand(50, 175, 200, 10, &pid1, &path));
-  // Scheduler::master->addCommand(new DrivePathCommand(&path, true, 200, 15, &pid1));
+  Scheduler::master->addCommand(new DrivePathCommand(&path, true, 200, 15, &pid1));
   // Scheduler::master->addCommand(new AvoidanceCommand());
  
  
@@ -77,12 +83,12 @@ void loop() {
   // Serial.println(usDist);
   // If there is an obstacle detected, interrupt scheduler with avoidance routine
   if(avoidance->isObstacle()){//Sensors::getLeftIR()->getLast() || Sensors::getRightIR()->getLast()){//} || (usDist > 0 && usDist < 20)){
-    Serial.println("AVOID");
-    Serial.print(Sensors::getLeftIR()->getSmoothed());
-    Serial.print("\t");
-    Serial.print(Sensors::getRightIR()->getSmoothed());
-    Serial.print("\t");
-    Serial.println(usDist);
+    // Serial.println("AVOID");
+    // Serial.print(Sensors::getLeftIR()->getSmoothed());
+    // Serial.print("\t");
+    // Serial.print(Sensors::getRightIR()->getSmoothed());
+    // Serial.print("\t");
+    // Serial.println(usDist);
     // Nothing will happen if there is already an interrupting command
     Scheduler::master->interrupt(avoidance);
   }
@@ -99,7 +105,7 @@ void loop() {
     Serial.println("Done");
     while(1){};
   };
-  delay(100);
+//delay(100);
 }
 
 int testState = 0;

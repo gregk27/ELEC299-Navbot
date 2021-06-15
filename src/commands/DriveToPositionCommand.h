@@ -10,11 +10,13 @@ class DriveToPositionCommand: public Command {
   protected:
     float targetX;
     float targetY;
+
+    PID_v2 *controller;
+  
   private:
     float tol;
     byte speed;
 
-    PID_v2 *controller;
     List<IMU::Position> *path;
 
   public:

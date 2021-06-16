@@ -55,8 +55,8 @@ void setup() {
   // Scheduler::master->addCommand(new SearchCommand(150, 0, 30, 20, &pid1, &pid2));
   // Scheduler::master->addCommand(new DriveToPositionCommand(-50, 125, 200, 10, &pid1, &path));
   // Scheduler::master->addCommand(new DriveToPositionCommand(50, 175, 200, 10, &pid1, &path));
-  Scheduler::master->addCommand(new ComputePathCommand(&path, retPath));
-  // Scheduler::master->addCommand(new DrivePathCommand(retPath, false, 200, 15, &pid1));
+  Scheduler::master->addCommand(new ComputePathCommand(&path, &retPath));
+  Scheduler::master->addCommand(new DrivePathCommand(&retPath, false, 200, 15, &pid1));
   // Scheduler::master->addCommand(new AvoidanceCommand());
  
  

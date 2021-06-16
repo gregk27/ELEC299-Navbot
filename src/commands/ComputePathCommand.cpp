@@ -3,9 +3,9 @@
 
 // Macros to facilitate using [] operator on pointers
 #define PATHIN (*pathIn)
-#define PATHOUT (*pathOut)
+#define PATHOUT (**pathOut)
 
-ComputePathCommand::ComputePathCommand(List<IMU::Location> *pathIn, List<IMU::Location> *pathOut){
+ComputePathCommand::ComputePathCommand(List<IMU::Location> *pathIn, List<IMU::Location> **pathOut){
     this->pathIn = pathIn;
     this->pathOut = pathOut;
 }
@@ -25,8 +25,11 @@ void ComputePathCommand::init(){
 
     Serial.println(freeMemory());
     // Either initialise or re-initialise pathOut at same size as pathIn
-    if(pathOut && pathOut->getCapacity() < count) delete pathOut;
-    pathOut = new List<IMU::Location>(count);
+    if(!pathOut){
+        pathOut = new List<IMU::Location> *;
+    }
+    if(*pathOut && (*pathOut)->getCapacity() < count) delete pathOut;
+    *pathOut = new List<IMU::Location>(count);
 
     Serial.println("Allocation complete");
     Serial.println(freeMemory());
@@ -60,14 +63,14 @@ void ComputePathCommand::init(){
         // Save the best point and use it for next iteration
         Serial.print("Adding: ");
         Serial.println(bestIdx);
-        pathOut->add(PATHIN[bestIdx]);
+        (*pathOut)->add(PATHIN[bestIdx]);
         current = PATHIN[bestIdx];
         currIdx = bestIdx;
     }
 
     Serial.println("\nComputed Path:");
-    Serial.println(pathOut->size());
-    for(int i=0; i<pathOut->size(); i++){
+    Serial.println((*pathOut)->size());
+    for(int i=0; i<(*pathOut)->size(); i++){
         Serial.print(-PATHOUT[i].x);
         Serial.print(",");
         Serial.println(PATHOUT[i].y);

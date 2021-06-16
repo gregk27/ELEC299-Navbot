@@ -1,6 +1,6 @@
 #include "./DrivePathCommand.h"
 
-DrivePathCommand::DrivePathCommand(List<IMU::Location> *path, bool reverse, byte speed, float tol, PID_v2 *controller)
+DrivePathCommand::DrivePathCommand(List<IMU::Location> **path, bool reverse, byte speed, float tol, PID_v2 *controller)
 : DriveToPositionCommand(0, 0, speed, tol, controller, 0x0){
   this->path = path; 
   this->reverse = reverse;
@@ -8,17 +8,21 @@ DrivePathCommand::DrivePathCommand(List<IMU::Location> *path, bool reverse, byte
 
 bool DrivePathCommand::setTargetNode(int idx){
     // If it's travelled the full path, then end
-    if(idx >= path->size()) return false;
+    if(idx >= (*path)->size()) return false;
     // Otherwise, target the next node
-    IMU::Location pos = (*path)[idx];
+    IMU::Location pos = (**path)[idx];
     targetX = pos.x;
     targetY = pos.y;
+    Serial.print("Targeting: ");
+    Serial.print(targetX);
+    Serial.print(",");
+    Serial.println(targetY);
     return true;
 }
 
 void DrivePathCommand::init(){
   if(reverse){
-    path->reverse();
+    (*path)->reverse();
   }
   DriveToPositionCommand::init();
   idx = 0;

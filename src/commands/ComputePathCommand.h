@@ -8,10 +8,10 @@
 class ComputePathCommand: public Command {
   private:
     List<IMU::Location> *pathIn;
-    List<IMU::Location> *pathOut;
+    List<IMU::Location> **pathOut;
 
   public:
-    ComputePathCommand(List<IMU::Location> *pathIn, List<IMU::Location> *pathOut);
+    ComputePathCommand(List<IMU::Location> *pathIn, List<IMU::Location> **pathOut);
 
     void init() override;
     bool isFinished() override;

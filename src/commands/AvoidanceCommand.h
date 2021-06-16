@@ -2,6 +2,7 @@
 #define AVOIDANCECOMMAND_H
 
 #include "./Command.h"
+#include "../hardware/Odom.h"
 #include "../utils/List.h"
 
 /**
@@ -10,17 +11,11 @@
 */
 class AvoidanceCommand: public Command {
   private:
-    /**
-     * Timeout used to pause change of operation case
-    */
+    /** Timeout used to pause change of operation case */
     unsigned long timeout;
-    /**
-     * Timeout to prevent ending of command, used to increase clearance
-    */
+    /** Timeout to prevent ending of command, used to increase clearance */
     unsigned long endTimeout;
-    /**
-     * Path that position will be saved to
-    */
+    /** Path that position will be saved to */
     List<Odom::Location> *path;
 
     /**

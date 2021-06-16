@@ -16,23 +16,21 @@ void ComputePathCommand::init(){
 
     int count = pathIn->size();
 
-    Serial.println(count);
+    Serial.print("Building path from: ");
+    Serial.print(count);
+    Serial.println(" nodes");
     for(int i=0; i<pathIn->size(); i++){
         Serial.print(-PATHIN[i].x);
         Serial.print(F(","));
         Serial.println(PATHIN[i].y);
     }
 
-    Serial.println(freeMemory());
     // Either initialise or re-initialise pathOut at same size as pathIn
     if(!pathOut){
         pathOut = new List<IMU::Location> *;
     }
     if(*pathOut && (*pathOut)->getCapacity() < count) delete pathOut;
     *pathOut = new List<IMU::Location>(count);
-
-    Serial.println("Allocation complete");
-    Serial.println(freeMemory());
 
     // Start working from current position
     IMU::Location current = PATHIN[count-1];

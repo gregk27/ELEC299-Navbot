@@ -37,8 +37,6 @@ bool Scheduler::interrupt(Command *command){
   if(interruptCommand) return false;
   interruptCommand = command;
   interruptCommand->init();
-  Serial.print("INTERRUPT: ");
-  Serial.println((unsigned long) command);
   return true;
 }
 
@@ -65,7 +63,6 @@ void Scheduler::periodic(){
   Command *c = schedule[currentCommand];
   // Run interrupt command if active
   if(interruptCommand) c = interruptCommand;
-  // Serial.println((unsigned long) c);
   // Call periodic function
   c->periodic();
   

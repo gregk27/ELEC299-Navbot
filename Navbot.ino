@@ -75,24 +75,12 @@ void loop() {
   Sensors::periodic();
   IMU::Position pos = IMU::getPosition();
   float usDist = Sensors::getUltrasonicDistance()->getSmoothed();
-  // Serial.println("LOOP");
 
   // -------
   //  Think
   // -------
-  // Serial.print(Sensors::getLeftIR()->getSmoothed());
-  // Serial.print("\t");
-  // Serial.print(Sensors::getRightIR()->getSmoothed());
-  // Serial.print("\t");
-  // Serial.println(usDist);
   // If there is an obstacle detected, interrupt scheduler with avoidance routine
   if(avoidance->isObstacle()){//Sensors::getLeftIR()->getLast() || Sensors::getRightIR()->getLast()){//} || (usDist > 0 && usDist < 20)){
-    // Serial.println("AVOID");
-    // Serial.print(Sensors::getLeftIR()->getSmoothed());
-    // Serial.print("\t");
-    // Serial.print(Sensors::getRightIR()->getSmoothed());
-    // Serial.print("\t");
-    // Serial.println(usDist);
     // Nothing will happen if there is already an interrupting command
     Scheduler::master->interrupt(avoidance);
   }

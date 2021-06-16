@@ -37,7 +37,6 @@ bool SearchCommand::isFinished(){
     *   | 0
     */
     if(DriveToPositionCommand::isFinished()){
-        Serial.println(i);
         switch(i % 4){
             case 0:
                 // Drive to right extreme

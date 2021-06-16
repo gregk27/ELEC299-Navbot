@@ -144,7 +144,6 @@ void Gyro::init() {
         // mpu.CalibrateGyro(6);
         // mpu.PrintActiveOffsets();
         // turn on the DMP, now that it's ready
-        Serial.println(F("Enabling DMP..."));
         mpu.setDMPEnabled(true);
         dmpReady = true;
 
@@ -177,12 +176,7 @@ void Gyro::periodic() {
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-            // Serial.print("ypr\t");
-            // Serial.print(ypr[0] * 180/M_PI);
-            // Serial.print("\t");
-            // Serial.print(ypr[1] * 180/M_PI);
-            // Serial.print("\t");
-            // Serial.println(ypr[2] * 180/M_PI);
+           
             gyroYaw.addSample(-ypr[0]);
     }
 }

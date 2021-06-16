@@ -55,7 +55,6 @@ SmoothedValue<float> ultrasonic(5, [](float* samples, int count)->float {
     if(samples[i] >= 0) sum += samples[i];
     else badSamples ++;
   }
-  Serial.println(badSamples);
   // Need 3 good samples to get value
   if(badSamples >= 2){
     return -2;

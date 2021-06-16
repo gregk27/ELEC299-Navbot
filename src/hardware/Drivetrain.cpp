@@ -77,11 +77,6 @@ void Drivetrain::setOutput(int l, int r){
 
 int Drivetrain::getStraightCorrection(){
   int err = rightEncoder->getPosition() - leftEncoder->getPosition();
-  // Serial.print(Drivetrain::leftEncoder->getPosition());
-  // Serial.print("\t");
-  // Serial.print(Drivetrain::rightEncoder->getPosition());
-  // Serial.print("\t");
-  // Serial.println(err);
   return err*12;
 }
 

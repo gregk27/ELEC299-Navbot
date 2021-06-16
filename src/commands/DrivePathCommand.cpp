@@ -13,10 +13,6 @@ bool DrivePathCommand::setTargetNode(int idx){
     IMU::Location pos = (**path)[idx];
     targetX = pos.x;
     targetY = pos.y;
-    Serial.print("Targeting: ");
-    Serial.print(targetX);
-    Serial.print(",");
-    Serial.println(targetY);
     return true;
 }
 

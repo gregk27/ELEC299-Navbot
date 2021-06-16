@@ -36,21 +36,10 @@ void TurnToHeadingCommand::init(){
   controller->SetOutputLimits(-255, 255);
 
   timeout += millis();
-  // Serial.println(target);
 }
 
 void TurnToHeadingCommand::periodic(){
   float hdgOut = controller->Run(IMU::angleTo(target));
-  // Serial.print(hdgOut);
-  // Serial.print("\t");
-  // Serial.print(IMU::getPosition().heading);
-  // Serial.print("\t");
-  // Serial.print(IMU::angleTo(target));
-  // Serial.print("\t");
-  // Serial.println(controller->GetSetpoint());
-  // Serial.print(5);
-  // Serial.print("\t");
-  // Serial.println(-5);
   Drivetrain::setOutput(hdgOut, -hdgOut, speed);
 }
 
@@ -59,9 +48,5 @@ void TurnToHeadingCommand::end(){
 }
 
 bool TurnToHeadingCommand::isFinished(){
-  // Serial.print(millis());
-  // Serial.print("\t");
-  // Serial.println(timeout);
-  Serial.println(IMU::angleTo(target));
   return abs(IMU::angleTo(target)) < tol || millis() > timeout;
 }

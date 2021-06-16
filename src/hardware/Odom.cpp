@@ -1,11 +1,11 @@
-#include "./IMU.h"
+#include "./Odom.h"
 #include <Arduino.h>
 #include "./Drivetrain.h"
 #include "./Gyro.h"
 
 // Positional computations taken from: https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-186-mobile-autonomous-systems-laboratory-january-iap-2005/study-materials/odomtutorial.pdf
 
-using namespace IMU;
+using namespace Odom;
 
 // -------------------
 // Helper functions
@@ -41,7 +41,7 @@ ISR(TIMER1_COMPB_vect){
 // Namepsace functions
 // -------------------
 
-void IMU::init(){
+void Odom::init(){
   // Prepare speed timer interrupt, see https://busylog.net/FILES2DW/doc8161.pdf page 134
   noInterrupts();
   TCCR1A = 4; // Set clock to mode 4 (Clear timer on compare match)
@@ -58,11 +58,11 @@ void IMU::init(){
   Drivetrain::resetPosition();
 }
 
-Position IMU::getPosition(){
+Position Odom::getPosition(){
   return pos;
 }
 
-void IMU::toPlot(){
+void Odom::toPlot(){
   Serial.print(pos.x);
   Serial.print(F("\t"));
   Serial.print(pos.y);
@@ -71,11 +71,11 @@ void IMU::toPlot(){
   Serial.println(F(""));
 }
 
-float IMU::headingTo(float x, float y){
+float Odom::headingTo(float x, float y){
   return atan2((x-pos.x), y-pos.y);
 }
 
-float IMU::angleTo(float h){
+float Odom::angleTo(float h){
   float err = h-pos.heading;
   if(err > PI) return err-2*PI;
   else if (err < -PI) return err+2*PI;

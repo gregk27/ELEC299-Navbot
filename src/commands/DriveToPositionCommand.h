@@ -3,7 +3,7 @@
 
 #include <PID_v2.h>
 #include "./Command.h"
-#include "../hardware/IMU.h"
+#include "../hardware/Odom.h"
 #include "../utils/List.h"
 
 class DriveToPositionCommand: public Command {
@@ -17,10 +17,10 @@ class DriveToPositionCommand: public Command {
     float tol;
     byte speed;
 
-    List<IMU::Location> *path;
+    List<Odom::Location> *path;
 
   public:
-    DriveToPositionCommand(float x, float y, byte speed, float tol, PID_v2 *controller, List<IMU::Location> *path);
+    DriveToPositionCommand(float x, float y, byte speed, float tol, PID_v2 *controller, List<Odom::Location> *path);
 
     // Functions are virtual to allow for overriding
     

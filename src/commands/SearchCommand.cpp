@@ -17,7 +17,7 @@ SearchCommand::SearchCommand(byte speed, float centre, byte width, byte height, 
 
 void SearchCommand::init(){
     i = 0;
-    targetY = IMU::getPosition().y;
+    targetY = Odom::getPosition().y;
     DriveToPositionCommand::init();
     // Change to better tunings
     controller->SetTunings(100, 0, 10);

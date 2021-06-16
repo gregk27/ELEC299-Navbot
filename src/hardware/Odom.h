@@ -1,7 +1,7 @@
-#ifndef IMU_H
-#define IMU_H
+#ifndef ODOM_H
+#define ODOM_H
 
-namespace IMU {
+namespace Odom {
   /**
    * Smaller struct holding basic location information, realtive to start
   */
@@ -27,7 +27,7 @@ namespace IMU {
   };
 
   /**
-    * Initialise the IMU
+    * Initialise the Odom
     * This should be done after intialising the drivetrain and sensors
   */
   void init();

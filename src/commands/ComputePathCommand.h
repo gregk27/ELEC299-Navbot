@@ -3,15 +3,15 @@
 
 #include "./Command.h"
 #include "../utils/List.h"
-#include "../hardware/IMU.h"
+#include "../hardware/Odom.h"
 
 class ComputePathCommand: public Command {
   private:
-    List<IMU::Location> *pathIn;
-    List<IMU::Location> **pathOut;
+    List<Odom::Location> *pathIn;
+    List<Odom::Location> **pathOut;
 
   public:
-    ComputePathCommand(List<IMU::Location> *pathIn, List<IMU::Location> **pathOut);
+    ComputePathCommand(List<Odom::Location> *pathIn, List<Odom::Location> **pathOut);
 
     void init() override;
     bool isFinished() override;

@@ -1,16 +1,16 @@
 #include "AvoidanceCommand.h"
 #include "../hardware/Sensors.h"
-#include "../hardware/IMU.h"
+#include "../hardware/Odom.h"
 #include "../hardware/Drivetrain.h"
 #include "../utils/List.h"
 #include "../../Scheduler.h"
 
 using namespace Sensors;
-extern List<IMU::Location> path;
+extern List<Odom::Location> path;
 
 // Non-class function to save position on path
 void savePosition(){
-    IMU::Position pos = IMU::getPosition();
+    Odom::Position pos = Odom::getPosition();
     // Add the point left and behind of the vehicle to increase clearance
     // Equations from https://gamedev.stackexchange.com/a/79779
     int xOffset = -50;
@@ -25,7 +25,7 @@ AvoidanceCommand::AvoidanceCommand(){
 }
 
 void AvoidanceCommand::init(){
-  IMU::Position pos = IMU::getPosition();
+  Odom::Position pos = Odom::getPosition();
   holdHeading = pos.heading;
   // Remove the last path position to increase clearance of obstacle
   // path.pop();
@@ -50,7 +50,7 @@ void AvoidanceCommand::periodic(){
     // TODO: Increase cleareance to allow for sloppy positional tracking
     // Save path around obstacle for return path
     if(millis() % 250 == 0){
-      path.add(IMU::getPosition());
+      path.add(Odom::getPosition());
     }
     // Exponential error to prevent overcorrecting
     float err = pow(15-usDist, 3)*0.005;

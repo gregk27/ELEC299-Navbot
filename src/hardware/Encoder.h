@@ -22,7 +22,7 @@ class Encoder {
 
   public:
     
-    /** Minimum time interval between ticks */
+    /** MinOdomm time interval between ticks */
     int interval = 2;
     /** Number of encoder ticks in a revolution */
     int ticksPerRev = 40;

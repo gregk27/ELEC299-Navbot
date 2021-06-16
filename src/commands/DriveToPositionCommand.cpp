@@ -4,7 +4,7 @@
 #include "../../Scheduler.h"
 #include "./TurnToHeadingCommand.h"
 
-using namespace IMU;
+using namespace Odom;
 
 
 DriveToPositionCommand::DriveToPositionCommand(float x, float y, byte speed, float tol, PID_v2 *controller, List<Location> *path){
@@ -17,7 +17,7 @@ DriveToPositionCommand::DriveToPositionCommand(float x, float y, byte speed, flo
 }
 
 void DriveToPositionCommand::init(){
-  if(path) path->add(IMU::getPosition());
+  if(path) path->add(Odom::getPosition());
   controller->SetTunings(150, 5, 20);
   controller->Start(0, 0, 0);
   controller->SetOutputLimits(-255, 255);

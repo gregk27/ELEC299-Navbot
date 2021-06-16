@@ -18,7 +18,7 @@ void TurnToHeadingCommand::setTarget(float target, bool absolute){
   this->target = target;
   this->absolute = absolute;
     // If using a relative heading, then add the current one before proceeding
-  if(!absolute) target += IMU::getPosition().heading;
+  if(!absolute) target += Odom::getPosition().heading;
 }
 
 
@@ -28,7 +28,7 @@ void TurnToHeadingCommand::init(){
   initialRightPos = Drivetrain::rightEncoder->getPosition();
 
   // If using a relative heading, then add the current one before proceeding
-  if(!absolute) target += IMU::getPosition().heading;
+  if(!absolute) target += Odom::getPosition().heading;
 
   // Start the PID controller
   controller->SetTunings(300, 5, 25);
@@ -39,7 +39,7 @@ void TurnToHeadingCommand::init(){
 }
 
 void TurnToHeadingCommand::periodic(){
-  float hdgOut = controller->Run(IMU::angleTo(target));
+  float hdgOut = controller->Run(Odom::angleTo(target));
   Drivetrain::setOutput(hdgOut, -hdgOut, speed);
 }
 
@@ -48,5 +48,5 @@ void TurnToHeadingCommand::end(){
 }
 
 bool TurnToHeadingCommand::isFinished(){
-  return abs(IMU::angleTo(target)) < tol || millis() > timeout;
+  return abs(Odom::angleTo(target)) < tol || millis() > timeout;
 }

@@ -1,6 +1,6 @@
 #include "./src/hardware/Drivetrain.h"
 #include "./src/hardware/Sensors.h"
-#include "./src/hardware/IMU.h"
+#include "./src/hardware/Odom.h"
 #include "./src/utils/List.h"
 #include "./Scheduler.h"
 
@@ -16,11 +16,11 @@
 /**
  * List of positions build while travelling, used to generate return path
 */
-List<IMU::Location> path = List<IMU::Location>(64);
+List<Odom::Location> path = List<Odom::Location>(64);
 /**
  * List of position generatred by ComputePathCommand 
 */
-List<IMU::Location> *retPath = 0x0;
+List<Odom::Location> *retPath = 0x0;
 
 /**
  * PID Controller shared by main navigation commands (saves alot of memory)
@@ -63,7 +63,7 @@ void setup() {
   // Final setup
   delay(1000);
   Drivetrain::resetPosition();
-  IMU::init();
+  Odom::init();
   Scheduler::master->init();
 }
 
@@ -73,7 +73,7 @@ void loop() {
   //  Sense
   // -------
   Sensors::periodic();
-  IMU::Position pos = IMU::getPosition();
+  Odom::Position pos = Odom::getPosition();
   float usDist = Sensors::getUltrasonicDistance()->getSmoothed();
 
   // -------
@@ -90,7 +90,7 @@ void loop() {
   // -----
   // Run scheduler
   Scheduler::master->periodic();
-  IMU::toPlot();
+  Odom::toPlot();
 
   // Hang when done
   if(Scheduler::master->isFinished()){

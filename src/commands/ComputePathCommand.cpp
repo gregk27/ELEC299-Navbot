@@ -5,14 +5,14 @@
 #define PATHIN (*pathIn)
 #define PATHOUT (**pathOut)
 
-ComputePathCommand::ComputePathCommand(List<IMU::Location> *pathIn, List<IMU::Location> **pathOut){
+ComputePathCommand::ComputePathCommand(List<Odom::Location> *pathIn, List<Odom::Location> **pathOut){
     this->pathIn = pathIn;
     this->pathOut = pathOut;
 }
 
 void ComputePathCommand::init(){
     // Add current position at end of path
-    pathIn->add(IMU::getPosition());
+    pathIn->add(Odom::getPosition());
 
     int count = pathIn->size();
 
@@ -27,13 +27,13 @@ void ComputePathCommand::init(){
 
     // Either initialise or re-initialise pathOut at same size as pathIn
     if(!pathOut){
-        pathOut = new List<IMU::Location> *;
+        pathOut = new List<Odom::Location> *;
     }
     if(*pathOut && (*pathOut)->getCapacity() < count) delete pathOut;
-    *pathOut = new List<IMU::Location>(count);
+    *pathOut = new List<Odom::Location>(count);
 
     // Start working from current position
-    IMU::Location current = PATHIN[count-1];
+    Odom::Location current = PATHIN[count-1];
     int currIdx = count-1;
 
     // Loop until first node found
@@ -45,7 +45,7 @@ void ComputePathCommand::init(){
         for(int i=0; i<count; i++){
             // Dont comare against self
             if(i == currIdx) continue;
-            IMU::Location tmp = PATHIN[i];
+            Odom::Location tmp = PATHIN[i];
             // Calculate angle between points, take negative due to orientation
             float angle = -atan2(current.y-tmp.y, current.x-tmp.x);
             // Adjust coordinate space

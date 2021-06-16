@@ -50,6 +50,11 @@ namespace Odom {
   */
   float headingTo(float x, float y);
 
+  /**
+   * Get the relative acute angle to a target heading
+   * @param h The target heading
+   * @return The relative acute angle
+  */
   float angleTo(float h);
 }
 

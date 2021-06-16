@@ -35,7 +35,7 @@ PID_v2 pid2(0,0,0,PID::Direct);
  * Command used for avoidance routine
  * Instantiated once to reduce memory use
 */
-AvoidanceCommand *avoidance = new AvoidanceCommand();
+AvoidanceCommand *avoidance = new AvoidanceCommand(&path);
 
 void setup() {
   Serial.begin(115200);
@@ -80,7 +80,7 @@ void loop() {
   //  Think
   // -------
   // If there is an obstacle detected, interrupt scheduler with avoidance routine
-  if(avoidance->isObstacle()){//Sensors::getLeftIR()->getLast() || Sensors::getRightIR()->getLast()){//} || (usDist > 0 && usDist < 20)){
+  if(AvoidanceCommand::isObstacle()){//Sensors::getLeftIR()->getLast() || Sensors::getRightIR()->getLast()){//} || (usDist > 0 && usDist < 20)){
     // Nothing will happen if there is already an interrupting command
     Scheduler::master->interrupt(avoidance);
   }

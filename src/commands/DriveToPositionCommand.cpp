@@ -1,8 +1,6 @@
 #include "./DriveToPositionCommand.h"
 #include "../hardware/Drivetrain.h"
-#include "../utils/List.h"
 #include "../../Scheduler.h"
-#include "./TurnToHeadingCommand.h"
 
 using namespace Odom;
 
@@ -17,7 +15,9 @@ DriveToPositionCommand::DriveToPositionCommand(float x, float y, byte speed, flo
 }
 
 void DriveToPositionCommand::init(){
+  // Save position to path
   if(path) path->add(Odom::getPosition());
+  // Configure PID controller
   controller->SetTunings(150, 5, 20);
   controller->Start(0, 0, 0);
   controller->SetOutputLimits(-255, 255);
@@ -25,10 +25,11 @@ void DriveToPositionCommand::init(){
 
 void DriveToPositionCommand::periodic(){
   Position pos = getPosition();
-  // Save position every 500 ms
+  // Save position every 50 iterations of scheduler
   if(Scheduler::master->getIteration() % 50 == 0 && path){
     path->add(pos);
   }
+  // Compute heading error and feed to PID controller
   float err = angleTo(headingTo(targetX, targetY));
   float correctOut = controller->Run(err);
   // If more than 45 degrees off, pivot to a more reasonable heading
@@ -45,5 +46,6 @@ void DriveToPositionCommand::end() {
 
 bool DriveToPositionCommand::isFinished() {
   Position pos = getPosition();
+  // Stop when both x and y position are within tolerance
   return (abs(targetX - pos.x) <= tol && abs(targetY - pos.y) <= tol);
 }

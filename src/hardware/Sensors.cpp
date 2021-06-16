@@ -2,7 +2,10 @@
 #include <Arduino.h>
 #include "../utils/SmoothedValue.h"
 
-// TODO: Confirm pin order
+// ---------------
+//  Configuration
+// ---------------
+
 #define LEFT_IR_PIN 9
 #define RIGHT_IR_PIN 10
 
@@ -12,6 +15,9 @@
 #define US_DURATION_TO_DISTANCE 0.01724137931 // 1/58, from docs
 
 #define DS_PIN A1
+
+int Sensors::USLastCall = 0;
+int Sensors::DSThreshold = 85;
 
 using namespace Sensors;
 
@@ -42,9 +48,6 @@ bool SmoothedValue<bool>::getSmoothed(){
   }
   return sum/numSamples > 0.5;
 }
-
-int Sensors::USLastCall = 0;
-int Sensors::DSThreshold = 85;
 
 SmoothedValue<bool> leftIR(5, SmoothFunctions::smoothBool);
 SmoothedValue<bool> rightIR(5, SmoothFunctions::smoothBool);

@@ -5,7 +5,9 @@
 
 namespace Sensors {
 
+  /** Timestamp of last ultrasonic sensor update, used to enforce 60ms wait between updates*/
   extern int USLastCall;
+  /** Threshold used by downard sensor to detect marker */
   extern int DSThreshold;
 
   /**
@@ -17,7 +19,16 @@ namespace Sensors {
   */
   void periodic();
 
+  /**
+   * Get left IR sensor detection
+   * @return True if sensor detects an obstacle
+  */
   SmoothedValue<bool>* getLeftIR();
+  
+  /**
+   * Get right IR sensor detection
+   * @return True if sensor detects an obstacle
+  */
   SmoothedValue<bool>* getRightIR();
 
   /**
@@ -26,7 +37,16 @@ namespace Sensors {
   */
   SmoothedValue<float>* getUltrasonicDistance();
 
+  /**
+   * Get downward sensor reading
+   * @return The downward sensor's raw reading
+  */
   SmoothedValue<int>* getDownwardSensor();
+  
+  /**
+   * Check if the robot is on the marker using the downward sensor
+   * @return True if smoothed sensor reading is above DSThreshold
+  */
   bool isOnMarker();
 }
 

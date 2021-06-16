@@ -16,6 +16,7 @@ void ComputePathCommand::init(){
 
     int count = pathIn->size();
 
+    // Print out data used for constructing path
     Serial.print(F("Building path from: "));
     Serial.print(count);
     Serial.println(F(" nodes"));
@@ -67,6 +68,7 @@ void ComputePathCommand::init(){
         currIdx = bestIdx;
     }
 
+    // Print out resulting path
     Serial.println(F("\nComputed Path:"));
     Serial.println((*pathOut)->size());
     for(int i=0; i<(*pathOut)->size(); i++){
@@ -79,5 +81,6 @@ void ComputePathCommand::init(){
 }
 
 bool ComputePathCommand::isFinished(){
+    // Since the command does everthing in init, it will be finshed instantly
     return true;
 }

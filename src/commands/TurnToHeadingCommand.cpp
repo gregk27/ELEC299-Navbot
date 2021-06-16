@@ -2,8 +2,6 @@
 #include "../hardware/Drivetrain.h"
 
 
-float TurnToHeadingCommand::kP_POS = 0;
-
 TurnToHeadingCommand::TurnToHeadingCommand(float target, bool absolute, int speed, float tol, unsigned long timeout, PID_v2 *controller) {
   this->target = target;
   this->absolute = absolute;
@@ -23,10 +21,6 @@ void TurnToHeadingCommand::setTarget(float target, bool absolute){
 
 
 void TurnToHeadingCommand::init(){
-  // Save initial encoder positions
-  initialLeftPos = Drivetrain::leftEncoder->getPosition();
-  initialRightPos = Drivetrain::rightEncoder->getPosition();
-
   // If using a relative heading, then add the current one before proceeding
   if(!absolute) target += Odom::getPosition().heading;
 
@@ -34,12 +28,14 @@ void TurnToHeadingCommand::init(){
   controller->SetTunings(300, 5, 25);
   controller->Start(0, 0, 0);
   controller->SetOutputLimits(-255, 255);
-
+  // Initialise timeout
   timeout += millis();
 }
 
 void TurnToHeadingCommand::periodic(){
+  // Get heading error and feed into controller
   float hdgOut = controller->Run(Odom::angleTo(target));
+  // Pivot up to max speed
   Drivetrain::setOutput(hdgOut, -hdgOut, speed);
 }
 
@@ -48,5 +44,6 @@ void TurnToHeadingCommand::end(){
 }
 
 bool TurnToHeadingCommand::isFinished(){
+  // End when within tolerance or timed out
   return abs(Odom::angleTo(target)) < tol || millis() > timeout;
 }

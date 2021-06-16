@@ -30,7 +30,7 @@ class Scheduler: public Command{
     /**
      * Interrupt the currently running command with another
      * Current command will resume upon completion
-     * An interrupt comnmand cannot be interrupted
+     * An interrupt command cannot be interrupted
      * @param command The new command to run
      * @return true if interrupt started, otherwise false
     */

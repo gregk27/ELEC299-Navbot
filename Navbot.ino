@@ -1,10 +1,11 @@
+#include <PID_v2.h>
+
+#include "./Scheduler.h"
+#include "./src/utils/List.h"
+
 #include "./src/hardware/Drivetrain.h"
 #include "./src/hardware/Sensors.h"
 #include "./src/hardware/Odom.h"
-#include "./src/utils/List.h"
-#include "./Scheduler.h"
-
-#include <PID_v2.h>
 
 #include "./src/commands/DriveToPositionCommand.h"
 #include "./src/commands/TurnToHeadingCommand.h"
@@ -41,7 +42,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println(F("Starting"));
 
-  //
+  // Early initialisation
   Drivetrain::init(4, 3, 3, 2);
   Drivetrain::setOutput(0,0);
   Sensors::init();
@@ -80,7 +81,7 @@ void loop() {
   //  Think
   // -------
   // If there is an obstacle detected, interrupt scheduler with avoidance routine
-  if(AvoidanceCommand::isObstacle()){//Sensors::getLeftIR()->getLast() || Sensors::getRightIR()->getLast()){//} || (usDist > 0 && usDist < 20)){
+  if(AvoidanceCommand::isObstacle()){
     // Nothing will happen if there is already an interrupting command
     Scheduler::master->interrupt(avoidance);
   }
@@ -90,6 +91,7 @@ void loop() {
   // -----
   // Run scheduler
   Scheduler::master->periodic();
+  // Output odometry data for plotting
   Odom::toPlot();
 
   // Hang when done
@@ -97,9 +99,14 @@ void loop() {
     Serial.println(F("Done"));
     while(1){};
   };
+
+  // Small delay to keep things running smooth
   delay(10);
 }
 
+
+
+/** State counter for self test */
 int testState = 0;
 
 /**

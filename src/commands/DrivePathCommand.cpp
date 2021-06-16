@@ -17,10 +17,13 @@ bool DrivePathCommand::setTargetNode(int idx){
 }
 
 void DrivePathCommand::init(){
+  // Reverse the path if requested
   if(reverse){
     (*path)->reverse();
   }
+  // Initialise parent command
   DriveToPositionCommand::init();
+  // Set navigation to first node
   idx = 0;
   setTargetNode(0);
 }

@@ -2,6 +2,9 @@
 #define  Command_H
 #include <Arduino.h>
 
+/**
+ * Base class represeting all commands
+*/
 class Command {
   public:
     /**

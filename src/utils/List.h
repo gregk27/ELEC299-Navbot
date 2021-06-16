@@ -28,7 +28,7 @@ class List {
     void add(T elem){
       numElements ++;
       if(numElements > capacity){
-        Serial.print("Array capacity overflow: ");
+        Serial.print(F("Array capacity overflow: "));
         Serial.println(numElements);
         while(1){};
       }

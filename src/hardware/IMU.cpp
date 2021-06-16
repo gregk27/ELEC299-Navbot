@@ -64,11 +64,11 @@ Position IMU::getPosition(){
 
 void IMU::toPlot(){
   Serial.print(pos.x);
-  Serial.print("\t");
+  Serial.print(F("\t"));
   Serial.print(pos.y);
-  Serial.print("\t");
+  Serial.print(F("\t"));
   Serial.print(pos.heading*180/PI);
-  Serial.println("");
+  Serial.println(F(""));
 }
 
 float IMU::headingTo(float x, float y){

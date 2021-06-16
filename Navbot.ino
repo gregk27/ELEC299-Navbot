@@ -39,7 +39,7 @@ AvoidanceCommand *avoidance = new AvoidanceCommand();
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("Starting");
+  Serial.println(F("Starting"));
 
   //
   Drivetrain::init(4, 3, 3, 2);
@@ -94,7 +94,7 @@ void loop() {
 
   // Hang when done
   if(Scheduler::master->isFinished()){
-    Serial.println("Done");
+    Serial.println(F("Done"));
     while(1){};
   };
   delay(10);
@@ -120,7 +120,7 @@ bool selfTest(){
     testState == 8 && Drivetrain::leftEncoder->getPosition() > 20 ||
     testState == 9 && Drivetrain::rightEncoder->getPosition() > 20
   ) {
-    Serial.print("Completed test: ");
+    Serial.print(F("Completed test: "));
     Serial.println(testState);
 
     
@@ -132,7 +132,7 @@ bool selfTest(){
     } else if(testState == 9){
       Drivetrain::resetPosition();
     } else if (testState == 10){
-      Serial.println("All tests complete");
+      Serial.println(F("All tests complete"));
     }
   }
   return testState < 10;

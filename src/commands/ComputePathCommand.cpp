@@ -16,9 +16,9 @@ void ComputePathCommand::init(){
 
     int count = pathIn->size();
 
-    Serial.print("Building path from: ");
+    Serial.print(F("Building path from: "));
     Serial.print(count);
-    Serial.println(" nodes");
+    Serial.println(F(" nodes"));
     for(int i=0; i<pathIn->size(); i++){
         Serial.print(-PATHIN[i].x);
         Serial.print(F(","));
@@ -59,7 +59,7 @@ void ComputePathCommand::init(){
             }
         }
         // Save the best point and use it for next iteration
-        Serial.print("Adding: ");
+        Serial.print(F("Adding: "));
         Serial.println(bestIdx);
         (*pathOut)->add(PATHIN[bestIdx]);
         PATHOUT[(*pathOut)->size()-1].x += 15;
@@ -67,15 +67,15 @@ void ComputePathCommand::init(){
         currIdx = bestIdx;
     }
 
-    Serial.println("\nComputed Path:");
+    Serial.println(F("\nComputed Path:"));
     Serial.println((*pathOut)->size());
     for(int i=0; i<(*pathOut)->size(); i++){
         Serial.print(-PATHOUT[i].x);
-        Serial.print(",");
+        Serial.print(F(","));
         Serial.println(PATHOUT[i].y);
     }
 
-    Serial.println("Pathfinding complete");
+    Serial.println(F("Pathfinding complete"));
 }
 
 bool ComputePathCommand::isFinished(){

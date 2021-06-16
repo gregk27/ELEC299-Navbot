@@ -78,9 +78,9 @@ void Scheduler::periodic(){
       currentCommand ++;
       // Exit if schedule complete
       if(currentCommand >= schedule.size()) return;
-      Serial.print("Starting command: ");
+      Serial.print(F("Starting command: "));
       Serial.print(currentCommand+1);
-      Serial.print("/");
+      Serial.print(F("/"));
       Serial.println(schedule.size());
       c = schedule[currentCommand];
       c->init();

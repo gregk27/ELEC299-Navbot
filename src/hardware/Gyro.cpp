@@ -149,7 +149,7 @@ void Gyro::init() {
 
         // get expected DMP packet size for later comparison
         packetSize = mpu.dmpGetFIFOPacketSize();
-        Serial.println("Gyro enabled");
+        Serial.println(F("Gyro enabled"));
     } else {
         // ERROR!
         // 1 = initial memory load failed

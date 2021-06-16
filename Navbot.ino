@@ -16,11 +16,11 @@
 /**
  * List of positions build while travelling, used to generate return path
 */
-List<IMU::Location> path = List<IMU::Location>(32);
+List<IMU::Location> path = List<IMU::Location>(64);
 /**
  * List of position generatred by ComputePathCommand 
 */
-List<IMU::Location> *retPath;
+List<IMU::Location> *retPath = 0x0;
 
 /**
  * PID Controller shared by main navigation commands (saves alot of memory)
@@ -50,15 +50,12 @@ void setup() {
   Scheduler::master = new Scheduler(16);
 
   // Schedule main navigation commands
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 150, 220, 20, &pid1, &path));
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 200, 220, 5, &pid1, 0x0));
-  // Scheduler::master->addCommand(new SearchCommand(150, 0, 30, 20, &pid1, &pid2));
-  // Scheduler::master->addCommand(new DriveToPositionCommand(-50, 125, 200, 10, &pid1, &path));
-  // Scheduler::master->addCommand(new DriveToPositionCommand(50, 175, 200, 10, &pid1, &path));
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 250, 220, 20, &pid1, &path));
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 300, 220, 10, &pid1, 0x0));
+  Scheduler::master->addCommand(new SearchCommand(150, 0, 30, 20, &pid1, &pid2));
+  Scheduler::master->addCommand(new TurnToHeadingCommand(PI, true, 175, 0.1, 3000, &pid1));
   Scheduler::master->addCommand(new ComputePathCommand(&path, &retPath));
   Scheduler::master->addCommand(new DrivePathCommand(&retPath, false, 200, 15, &pid1));
-  // Scheduler::master->addCommand(new AvoidanceCommand());
- 
  
   // Run selftest
   // while(selfTest()){};
@@ -105,7 +102,7 @@ void loop() {
   // -----
   // Run scheduler
   Scheduler::master->periodic();
-  // IMU::toPlot();
+  IMU::toPlot();
 
   // Hang when done
   if(Scheduler::master->isFinished()){

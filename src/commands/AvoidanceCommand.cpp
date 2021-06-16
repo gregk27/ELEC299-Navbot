@@ -13,8 +13,8 @@ void savePosition(){
     IMU::Position pos = IMU::getPosition();
     // Add the point left and behind of the vehicle to increase clearance
     // Equations from https://gamedev.stackexchange.com/a/79779
-    int xOffset = -10;
-    int yOffset = 5;
+    int xOffset = -50;
+    int yOffset = 0;
     path.add({
       (int) (pos.x + cos(-pos.heading)*(xOffset) - sin(-pos.heading)*(yOffset)),
       (int) (pos.y + cos(-pos.heading)*(yOffset) + sin(-pos.heading)*(xOffset))
@@ -36,7 +36,7 @@ void AvoidanceCommand::init(){
 }
 
 void AvoidanceCommand::periodic(){
-  if(Scheduler::master->getIteration() % 50 == 0){
+  if(Scheduler::master->getIteration() % 20 == 0){
     savePosition();
   }
 

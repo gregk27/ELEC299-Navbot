@@ -63,7 +63,7 @@ void ComputePathCommand::init(){
         Serial.print(F("Adding: "));
         Serial.println(bestIdx);
         (*pathOut)->add(PATHIN[bestIdx]);
-        PATHOUT[(*pathOut)->size()-1].x += 15;
+        // PATHOUT[(*pathOut)->size()-1].x += 15;
         current = PATHIN[bestIdx];
         currIdx = bestIdx;
     }

@@ -51,12 +51,12 @@ void setup() {
   Scheduler::master = new Scheduler(16);
 
   // Schedule main navigation commands
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 250, 220, 20, &pid1, &path));
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 200, 200, 20, &pid1, &path));
   Scheduler::master->addCommand(new DriveToPositionCommand(0, 300, 220, 10, &pid1, 0x0));
   Scheduler::master->addCommand(new SearchCommand(150, 0, 30, 20, &pid1, &pid2));
   Scheduler::master->addCommand(new TurnToHeadingCommand(PI, true, 175, 0.1, 3000, &pid1));
   Scheduler::master->addCommand(new ComputePathCommand(&path, &retPath));
-  Scheduler::master->addCommand(new DrivePathCommand(&retPath, false, 200, 15, &pid1));
+  Scheduler::master->addCommand(new DrivePathCommand(&retPath, false, 250, 10, &pid1));
  
   // Run selftest
   // while(selfTest()){};
@@ -92,7 +92,7 @@ void loop() {
   // Run scheduler
   Scheduler::master->periodic();
   // Output odometry data for plotting
-  Odom::toPlot();
+  // Odom::toPlot();
 
   // Hang when done
   if(Scheduler::master->isFinished()){

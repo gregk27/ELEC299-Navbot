@@ -12,8 +12,9 @@ void AvoidanceCommand::savePosition(){
     Odom::Position pos = Odom::getPosition();
     // Add the point left and behind of the vehicle to increase clearance
     // Equations from https://gamedev.stackexchange.com/a/79779
-    int xOffset = -50;
-    int yOffset = 0;
+    int xOffset = 20;
+    int yOffset = 0;//-50;
+
     path->add({
       (int) (pos.x + cos(-pos.heading)*(xOffset) - sin(-pos.heading)*(yOffset)),
       (int) (pos.y + cos(-pos.heading)*(yOffset) + sin(-pos.heading)*(xOffset))
@@ -32,7 +33,7 @@ void AvoidanceCommand::init(){
 
 void AvoidanceCommand::periodic(){
   // Save the position periodically
-  if(Scheduler::master->getIteration() % 20 == 0){
+  if(Scheduler::master->getIteration() % 10 == 0){
     savePosition();
   }
 
@@ -43,18 +44,18 @@ void AvoidanceCommand::periodic(){
   if(getLeftIR()->getLast()){ // Case 3
     // Pivot, but maintain some forward motion to ensure obstacle remains in sight
     Drivetrain::setOutput(-100, 175);
-    endTimeout = millis() + 100;
+    endTimeout = millis() + 200;
   
   } else if(usDist > 0 && usDist < 20){ // Case 2
     // Exponential error to prevent under/overcorrecting in various areas
     float err = pow(15-usDist, 3)*0.005;
     Drivetrain::setOutput(200-err, 200+err);
-    endTimeout = millis() + 250;
+    endTimeout = millis() + 300;
   
   } else if(getRightIR()->getLast()){ // Case 1
     // Pivot in-place as robot should now be very close to obstacle
     Drivetrain::setOutput(-175, 175);
-    endTimeout = millis() + 100;
+    endTimeout = millis() + 200;
   
   } else { // Case 0
     // Drive ahead while waiting for command to end to increase distance

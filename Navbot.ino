@@ -52,17 +52,17 @@ void setup() {
 
   // Schedule main navigation commands
   Scheduler::master->addCommand(new DriveToPositionCommand(0, 200, 200, 20, &pid1, &path));
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 300, 220, 10, &pid1, 0x0));
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 250, 220, 10, &pid1, 0x0));
   Scheduler::master->addCommand(new SearchCommand(150, 0, 30, 20, &pid1, &pid2));
   Scheduler::master->addCommand(new TurnToHeadingCommand(PI, true, 175, 0.1, 3000, &pid1));
   Scheduler::master->addCommand(new ComputePathCommand(&path, &retPath));
   Scheduler::master->addCommand(new DrivePathCommand(&retPath, false, 250, 10, &pid1));
  
   // Run selftest
-  // while(selfTest()){};
+  while(selfTest()){};
 
   // Final setup
-  delay(1000);
+  delay(5000);
   Drivetrain::resetPosition();
   Odom::init();
   Scheduler::master->init();
@@ -114,16 +114,17 @@ int testState = 0;
  * @return false when complete
 */
 bool selfTest(){
-  int usd = Sensors::getUltrasonicDistance()->getSmoothed();
+  Sensors::periodic();
+  int usd = Sensors::getUltrasonicDistance()->getLast();
   if(
-    testState == 0 && usd == -1 ||
+    testState == 0 && usd == 0 ||
     testState == 1 && usd < 10  && usd > 0 ||
     testState == 2 && !Sensors::getLeftIR()->getSmoothed()  || 
     testState == 3 && Sensors::getLeftIR()->getSmoothed()  || 
     testState == 4 && !Sensors::getRightIR()->getSmoothed()  || 
     testState == 5 && Sensors::getRightIR()->getSmoothed()  || 
-    testState == 6 && Sensors::getDownwardSensor()->getSmoothed() < 10 ||
-    testState == 7 && Sensors::getDownwardSensor()->getSmoothed() > 10 ||
+    testState == 6 && !Sensors::isOnMarker() ||
+    testState == 7 && Sensors::isOnMarker() ||
     testState == 8 && Drivetrain::leftEncoder->getPosition() > 20 ||
     testState == 9 && Drivetrain::rightEncoder->getPosition() > 20
   ) {

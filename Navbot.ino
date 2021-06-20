@@ -51,12 +51,12 @@ void setup() {
   Scheduler::master = new Scheduler(16);
 
   // Schedule main navigation commands
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 200, 200, 20, &pid1, &path));
-  Scheduler::master->addCommand(new DriveToPositionCommand(0, 250, 220, 10, &pid1, 0x0));
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 250, 200, 20, &pid1, &path));
+  Scheduler::master->addCommand(new DriveToPositionCommand(0, 275, 220, 10, &pid1, 0x0));
   Scheduler::master->addCommand(new SearchCommand(150, 0, 30, 20, &pid1, &pid2));
   Scheduler::master->addCommand(new TurnToHeadingCommand(PI, true, 175, 0.1, 3000, &pid1));
   Scheduler::master->addCommand(new ComputePathCommand(&path, &retPath));
-  Scheduler::master->addCommand(new DrivePathCommand(&retPath, false, 250, 10, &pid1));
+  Scheduler::master->addCommand(new DrivePathCommand(&retPath, false, 250, 15, &pid1));
  
   // Run selftest
   while(selfTest()){};
@@ -81,7 +81,7 @@ void loop() {
   //  Think
   // -------
   // If there is an obstacle detected, interrupt scheduler with avoidance routine
-  if(AvoidanceCommand::isObstacle()){
+  if(AvoidanceCommand::isObstacle() && !Sensors::ignoreSensors){
     // Nothing will happen if there is already an interrupting command
     Scheduler::master->interrupt(avoidance);
   }

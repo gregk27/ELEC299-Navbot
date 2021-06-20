@@ -27,6 +27,8 @@ void SearchCommand::init(){
 bool SearchCommand::isFinished(){
     // Stop when the marker is found
     if(Sensors::isOnMarker()){
+        // Disable sensors on return to cut corners tighter
+        Sensors::ignoreSensors = true;
         return true;
     }
     

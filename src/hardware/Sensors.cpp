@@ -17,7 +17,8 @@
 #define DS_PIN A1
 
 int Sensors::USLastCall = 0;
-int Sensors::DSThreshold = 85;
+int Sensors::DSThreshold = 95;
+bool Sensors::ignoreSensors = false;
 
 using namespace Sensors;
 

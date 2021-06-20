@@ -10,6 +10,8 @@ namespace Sensors {
   /** Threshold used by downard sensor to detect marker */
   extern int DSThreshold;
 
+  extern bool ignoreSensors;
+
   /**
    * Initialise sensors
   */

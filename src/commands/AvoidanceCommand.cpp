@@ -12,7 +12,7 @@ void AvoidanceCommand::savePosition(){
     Odom::Position pos = Odom::getPosition();
     // Add the point left and behind of the vehicle to increase clearance
     // Equations from https://gamedev.stackexchange.com/a/79779
-    int xOffset = 20;
+    int xOffset = 10;
     int yOffset = 0;//-50;
 
     path->add({
